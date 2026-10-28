@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feel Alive | Dermatologia, Nutrologia e Recovery em São Bernardo do Campo</title>
+  <meta name="description" content="Dermatologia, saúde e recuperação em São Bernardo do Campo, com cuidados que respeitam sua individualidade e acompanham cada fase da vida. Feel Alive — sentir-se vivo.">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta property="og:title" content="Feel Alive — Sentir-se vivo">
+  <meta property="og:description" content="Uma experiência de cuidado que acompanha a sua vida.">
+  <meta property="og:image" content="assets/img/dra-bony.jpg">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0a0a'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23e4b531'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
+  <script src="assets/js/gl.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+  <!-- Dados estruturados: validar endereço completo, telefone e horários antes de publicar -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalClinic",
+    "name": "Feel Alive",
+    "slogan": "Sentir-se vivo",
+    "description": "Dermatologia, estética, nutrologia, nutrição e Recovery em uma experiência individualizada.",
+    "medicalSpecialty": ["Dermatology", "Nutrition"],
+    "address": { "@type": "PostalAddress", "addressLocality": "São Bernardo do Campo", "addressRegion": "SP", "addressCountry": "BR", "streetAddress": "Domo Business" },
+    "founder": [{ "@type": "Person", "name": "Dra. Bony Lara" }, { "@type": "Person", "name": "Dr. Guilherme" }]
+  }
+  </script>
+</head>
+<body data-page="home">
+<main id="conteudo">
+
+  <!-- 01 / FILME DE ABERTURA -->
+  <section class="hero" aria-label="Abertura">
+    <div class="hero__media" data-video="assets/video/abertura.mp4">
+      <canvas class="hero__gl" aria-hidden="true"></canvas>
+      <div class="hero__glow"></div>
+      <div class="hero__photo"><img src="assets/img/dra-bony.jpg" alt="" fetchpriority="high"></div>
+      <div class="hero__grain"></div>
+    </div>
+    <div class="container">
+      <div class="hero__content">
+        <span class="hero__script script" aria-hidden="true">sentir-se vivo</span>
+        <h1 class="h1" data-split="chars">Viver bem começa quando você também se torna <em>prioridade.</em></h1>
+        <p class="hero__sub" data-reveal style="--d:500ms">Dermatologia, saúde e recuperação em São Bernardo do Campo, com cuidados que respeitam sua individualidade e acompanham cada fase da vida.</p>
+        <div class="hero__actions" data-reveal style="--d:700ms">
+          <a class="btn btn--gold" href="clinica.html" data-magnetic>Conheça a Feel Alive <span class="btn__arrow">→</span></a>
+          <a class="link-line" href="#jornadas" style="color:#fff">Descubra sua jornada</a>
+        </div>
+      </div>
+      <div class="film" role="group" aria-label="Capítulos do filme de abertura" data-reveal style="--d:900ms">
+        <button class="film__ch" data-t="0" data-caption="Um gesto simples diante do espelho."><span class="film__bar"><i></i></span><span><span class="film__t">00</span> <span class="film__label">A vida acontecendo</span></span></button>
+        <button class="film__ch" data-t="3" data-caption="Uma conversa que começa pela escuta."><span class="film__bar"><i></i></span><span><span class="film__t">03</span> <span class="film__label">O cuidado</span></span></button>
+        <button class="film__ch" data-t="7" data-caption="Energia e disposição acompanhadas de perto."><span class="film__bar"><i></i></span><span><span class="film__t">07</span> <span class="film__label">A saúde</span></span></button>
+        <button class="film__ch" data-t="11" data-caption="Água, vapor e luz: o corpo também desacelera."><span class="film__bar"><i></i></span><span><span class="film__t">11</span> <span class="film__label">A recuperação</span></span></button>
+        <button class="film__ch" data-t="15" data-caption="Feel Alive. Sentir-se vivo."><span class="film__bar"><i></i></span><span><span class="film__t">15</span> <span class="film__label">A essência</span></span></button>
+      </div>
+      <p class="film__caption" aria-live="polite"></p>
+    </div>
+    <span class="scroll-hint">Role</span>
+  </section>
+
+  <!-- ZOOM — a janela em arco se abre até ocupar a tela -->
+  <section class="zoom" data-zoom aria-label="Sentir-se vivo">
+    <div class="zoom__sticky">
+      <div class="zoom__frame"><canvas data-silk></canvas></div>
+      <div class="zoom__words" aria-hidden="true"><span class="zoom__l">Sentir-se</span><span class="zoom__r">vivo</span></div>
+      <div class="zoom__caption">
+        <span class="eyebrow" style="color:var(--gold)">Feel Alive</span>
+        <h2 class="h2">Uma experiência de cuidado que acompanha <em>a sua vida.</em></h2>
+      </div>
+      <span class="zoom__hint">Continue rolando</span>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="section section--dark" aria-label="Manifesto">
+    <div class="container">
+      <span class="eyebrow" data-reveal>Conceito central</span>
+      <p class="fill-text" data-fill style="margin-top:34px;max-width:22ch">Sentir-se vivo é ter <em>tempo para si,</em> reconhecer-se no espelho, ter disposição para a própria rotina e encontrar <em>espaço para cuidar de você.</em></p>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span class="marquee__item">Sua beleza acompanha sua história</span>
+      <span class="marquee__item">Mais disposição para viver o que importa</span>
+      <span class="marquee__item">Seu corpo também precisa de uma pausa</span>
+      <span class="marquee__item">Um olhar em comum. Diferentes especialidades</span>
+      <span class="marquee__item">Sua beleza acompanha sua história</span>
+      <span class="marquee__item">Mais disposição para viver o que importa</span>
+      <span class="marquee__item">Seu corpo também precisa de uma pausa</span>
+      <span class="marquee__item">Um olhar em comum. Diferentes especialidades</span>
+    </div>
+  </div>
+
+  <!-- 02 / NOSSO JEITO DE CUIDAR -->
+  <section class="section" aria-labelledby="cuidar-t">
+    <div class="container grid-2">
+      <div style="position:relative">
+        <div class="care__visual img-reveal">
+          <img src="assets/img/dra-bony.jpg" alt="Dra. Bony Lara, dermatologista e cofundadora da Feel Alive, sorrindo" data-parallax="0.08" loading="lazy">
+        </div>
+        <div class="care__badge" aria-hidden="true">
+          <svg viewBox="0 0 150 150"><defs><path id="circ" d="M75,75 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/></defs><text font-size="10.5" letter-spacing="3.6" font-family="Montserrat" font-weight="600"><textPath href="#circ">FEEL ALIVE · SENTIR-SE VIVO · DESDE O PRIMEIRO OLHAR ·</textPath></text></svg>
+          <b>FA</b>
+        </div>
+      </div>
+      <div class="stack">
+        <span class="eyebrow" data-reveal>Nosso jeito de cuidar</span>
+        <h2 class="h2" id="cuidar-t" data-split>Você cuida de tantas coisas. Aqui, queremos <em>cuidar de você.</em></h2>
+        <p class="lead" data-reveal>Entre família, trabalho e compromissos, muitas vezes o próprio cuidado fica para depois. Na Feel Alive, cada acompanhamento começa com uma conversa, respeitando sua história, sua rotina e o que deseja para si.</p>
+        <ul class="essence">
+          <li data-reveal><span>01</span><strong>Estética com naturalidade</strong><p>Cuidar da própria imagem sem apagar os traços, as expressões ou a história de cada pessoa.</p></li>
+          <li data-reveal style="--d:100ms"><span>02</span><strong>Saúde com visão de continuidade</strong><p>Hábitos, energia, bem-estar, acompanhamento clínico e objetivos de longo prazo.</p></li>
+          <li data-reveal style="--d:200ms"><span>03</span><strong>Recuperação com orientação</strong><p>Espaço para descanso e bem-estar dentro de uma rotina que muitas vezes exige demais.</p></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 / ESCOLHA SUA JORNADA -->
+  <section class="section section--dark" id="jornadas" aria-labelledby="jornadas-t">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow" data-reveal>Três universos. Uma mesma essência.</span>
+        <h2 class="h2" id="jornadas-t" data-split>Descubra sua <em>jornada</em> de cuidado.</h2>
+      </div>
+      <div class="journeys" data-skew>
+        <a class="journey" href="estetica.html" data-cursor="Explorar" data-reveal>
+          <div class="journey__media" data-liquid data-video="assets/video/estetica.mp4">
+            <img src="assets/img/dra-bony.jpg" alt="" loading="lazy" style="object-position:50% 14%">
+          </div>
+          <span class="journey__num">01</span>
+          <div class="journey__body">
+            <h3 class="journey__title">Estética e Dermatologia</h3>
+            <p class="journey__msg">“Sua beleza acompanha sua história.”</p>
+            <div class="journey__more"><div>
+              <p>Consultas, protocolos autorais, injetáveis e tecnologias faciais, corporais e capilares — para continuar se reconhecendo em cada fase.</p>
+              <span class="link-line">Conheça o universo</span>
+            </div></div>
+          </div>
+        </a>
+        <a class="journey" href="nutrologia.html" data-cursor="Explorar" data-reveal style="--d:120ms">
+          <div class="journey__media" data-liquid data-video="assets/video/saude.mp4">
+            <div class="vis vis--health">
+              <svg viewBox="0 0 800 200" preserveAspectRatio="none" aria-hidden="true"><path d="M0,100 L180,100 L210,60 L240,150 L270,30 L300,170 L330,100 L520,100 L545,75 L570,125 L595,100 L800,100"/><path d="M0,120 C120,80 200,160 320,120 S520,80 640,120 S760,140 800,110"/></svg>
+            </div>
+          </div>
+          <span class="journey__num">02</span>
+          <div class="journey__body">
+            <h3 class="journey__title">Saúde e Longevidade</h3>
+            <p class="journey__msg">“Mais disposição para viver o que importa.”</p>
+            <div class="journey__more"><div>
+              <p>Nutrologia e nutrição com atenção à rotina, aos hábitos e ao bem-estar de longo prazo. Qualidade de vida antes de qualquer número.</p>
+              <span class="link-line">Conheça o acompanhamento</span>
+            </div></div>
+          </div>
+        </a>
+        <a class="journey" href="recovery.html" data-cursor="Explorar" data-reveal style="--d:240ms">
+          <div class="journey__media" data-liquid data-video="assets/video/recovery.mp4">
+            <div class="vis vis--recovery"><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span><div class="steam"><i></i><i></i><i></i></div></div>
+          </div>
+          <span class="journey__num">03</span>
+          <div class="journey__body">
+            <h3 class="journey__title">Recovery</h3>
+            <p class="journey__msg">“Seu corpo também precisa de uma pausa.”</p>
+            <div class="journey__more"><div>
+              <p>Sauna, imersão em água fria, terapia de LED e massoterapia em um circuito orientado e individualizado.</p>
+              <span class="link-line">Conheça o Recovery</span>
+            </div></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 / PROTOCOLOS -->
+  <section class="hs section--ink" data-hscroll aria-labelledby="proto-t" style="color:#fff">
+    <div class="hs__sticky">
+      <div class="hs__track">
+        <div class="hs__intro">
+          <span class="eyebrow" style="color:var(--gold)">Protocolos</span>
+          <h2 class="h2" id="proto-t">O seu cuidado tem uma história. <em>Seu tratamento também.</em></h2>
+          <p class="lead" style="color:var(--muted-on-dark)">Planos personalizados, construídos a partir de avaliação — nunca um pacote igual para todos.</p>
+        </div>
+        <a class="proto" href="estetica.html#natural-face" data-cursor="Ver">
+          <div class="proto__bg" data-liquid><img src="assets/img/insta-pele-bonita.png" alt="" loading="lazy"></div>
+          <span class="proto__tag">Protocolo autoral · Dra. Bony</span><span class="proto__idx">01</span>
+          <h3>Natural Face</h3>
+          <p>A beleza de continuar sendo você. Planejamento facial individualizado, respeitando a identidade de cada paciente.</p>
+          <span class="link-line">Entenda o Natural Face</span>
+        </a>
+        <a class="proto" href="estetica.html#natural-lift" data-cursor="Ver">
+          <div class="proto__bg" data-liquid><img src="assets/img/insta-seu-rosto.png" alt="" loading="lazy"></div>
+          <span class="proto__tag">Protocolo autoral · Dra. Bony</span><span class="proto__idx">02</span>
+          <h3>Natural Lift</h3>
+          <p>Firmeza e sustentação com naturalidade, associando tecnologias e procedimentos minimamente invasivos conforme avaliação.</p>
+          <span class="link-line">Entenda o Natural Lift</span>
+        </a>
+        <a class="proto" href="nutrologia.html#neuromap" data-cursor="Ver">
+          <div class="proto__bg" data-liquid><canvas data-network style="width:100%;height:100%"></canvas></div>
+          <span class="proto__tag">Avaliação · Dr. Guilherme</span><span class="proto__idx">03</span>
+          <h3>NeuroMap</h3>
+          <p>Uma avaliação individualizada que orienta as etapas do cuidado, incluindo a experiência de Recovery.</p>
+          <span class="link-line">Conheça o NeuroMap</span>
+        </a>
+        <a class="proto" href="recovery.html" data-cursor="Ver">
+          <div class="proto__bg" data-liquid><div class="vis vis--recovery"><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span><div class="steam"><i></i><i></i><i></i></div></div></div>
+          <span class="proto__tag">Experiência</span><span class="proto__idx">04</span>
+          <h3>Recovery</h3>
+          <p>Um circuito orientado para o corpo desacelerar: sauna, imersão fria, LED e massoterapia.</p>
+          <span class="link-line">Conheça o Recovery</span>
+        </a>
+      </div>
+      <div class="hs__progress"><i></i></div>
+    </div>
+  </section>
+
+  <!-- 05 / CLUBES VIP -->
+  <section class="section vip-band" aria-labelledby="vip-t">
+    <div class="vip-band__ring"></div><div class="vip-band__ring"></div>
+    <div class="container">
+      <span class="eyebrow" data-reveal>Clubes VIP</span>
+      <h2 class="h2" id="vip-t" data-split style="margin-top:22px;max-width:14ch">Faça do seu cuidado uma parte da sua <em>rotina.</em></h2>
+      <p class="lead" data-reveal style="margin-top:24px">Acompanhamento contínuo, avaliação personalizada e benefícios exclusivos, com frequência e indicação definidas pela equipe.</p>
+      <ul class="vip-list" data-reveal>
+        <li>VIP Facial Tecnologia</li>
+        <li>VIP Facial Completo</li>
+        <li>VIP Corporal</li>
+        <li>VIP Facial + Corporal</li>
+        <li>VIP Feel Alive</li>
+      </ul>
+      <div style="margin-top:40px" data-reveal>
+        <a class="btn btn--gold" href="clubes-vip.html" data-magnetic>Conheça o clube ideal para o seu momento <span class="btn__arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 / EQUIPE -->
+  <section class="section" aria-labelledby="equipe-t">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow" data-reveal>Equipe</span>
+        <h2 class="h2" id="equipe-t" data-split>Um olhar em comum. <em>Diferentes especialidades.</em></h2>
+      </div>
+      <div class="team" data-reveal>
+        <article class="member" tabindex="0">
+          <div class="member__img" data-liquid><img src="assets/img/dra-bony.jpg" alt="Dra. Bony Lara" loading="lazy"></div>
+          <span class="member__vert">Dra. Bony Lara</span>
+          <div class="member__body">
+            <span class="member__role">Dermatologista · Fundadora</span>
+            <h3 class="member__name">Dra. Bony Lara</h3>
+            <div class="member__more"><div><p>Uma visão que valoriza a naturalidade e a beleza vivida em cada fase, sem incentivar a busca por uma idade que já passou.</p></div></div>
+          </div>
+        </article>
+        <article class="member" tabindex="0">
+          <div class="member__img"><div class="member__mono">G</div></div>
+          <span class="member__vert">Dr. Guilherme</span>
+          <div class="member__body">
+            <span class="member__role">Nutrologia · Cofundador</span>
+            <h3 class="member__name">Dr. Guilherme</h3>
+            <div class="member__more"><div><p>Saúde sustentável, hábitos acompanhados e longevidade — criador do NeuroMap.</p></div></div>
+          </div>
+        </article>
+        <article class="member" tabindex="0">
+          <div class="member__img"><div class="member__mono">D</div></div>
+          <span class="member__vert">Dermatologia</span>
+          <div class="member__body">
+            <span class="member__role">Equipe de dermatologia</span>
+            <h3 class="member__name">Dermatologistas</h3>
+            <div class="member__more"><div><p>Escuta, personalização, naturalidade e respeito à individualidade — cada profissional com sua voz.</p></div></div>
+          </div>
+        </article>
+        <article class="member" tabindex="0">
+          <div class="member__img"><div class="member__mono">N</div></div>
+          <span class="member__vert">Nutrição</span>
+          <div class="member__body">
+            <span class="member__role">Nutrição integrada</span>
+            <h3 class="member__name">Nutrição</h3>
+            <div class="member__more"><div><p>Atendimento com nutricionista como parte do acompanhamento e da construção de hábitos.</p></div></div>
+          </div>
+        </article>
+      </div>
+      <div style="margin-top:40px" data-reveal><a class="link-line" href="equipe.html">Conheça toda a equipe</a></div>
+    </div>
+  </section>
+
+  <!-- 07 / VENHA CONHECER -->
+  <section class="section section--dark" aria-labelledby="visita-t">
+    <div class="container visit">
+      <div class="visit__map img-reveal">
+        <iframe data-map title="Mapa: localização da Feel Alive no Domo Business" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <span class="visit__pin"></span>
+      </div>
+      <div class="stack">
+        <span class="eyebrow" data-reveal>Venha conhecer</span>
+        <h2 class="h2" id="visita-t" data-split>Um espaço para voltar a <em>olhar para você.</em></h2>
+        <ul class="info-list" data-reveal>
+          <li><span>Endereço</span><p data-address></p></li>
+          <li><span>Como chegar</span><p>Rotas, estacionamento e instruções de acesso <span class="validate">(a validar com a clínica)</span></p></li>
+          <li><span>Contato</span><p>WhatsApp com a recepção · horários a confirmar</p></li>
+        </ul>
+        <div class="hero__actions" data-reveal>
+          <button class="btn btn--gold" data-agendar data-magnetic>Agende sua avaliação <span class="btn__arrow">→</span></button>
+          <a class="btn btn--ghost" data-wa="Olá! Vim pelo site e gostaria de saber como chegar à Feel Alive.">Falar no WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ASSINATURA -->
+  <section class="signature" aria-label="Feel Alive — sentir-se vivo">
+    <div class="signature__word" aria-hidden="true"><span>F</span><span>E</span><span>E</span><span>L</span><span>&nbsp;</span><span>A</span><span>L</span><span>I</span><span>V</span><span>E</span></div>
+    <span class="signature__script script" aria-hidden="true">sentir-se vivo</span>
+  </section>
+
+</main>
+</body>
+</html>
