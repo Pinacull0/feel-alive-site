@@ -6,8 +6,9 @@
 const CONFIG = {
   whatsapp: '5511900000000', // TODO: número oficial de WhatsApp da recepção
   addressShort: 'Domo Business · São Bernardo do Campo',
-  address: 'Domo Business, ao lado do Shopping Metrópole — São Bernardo do Campo/SP',
-  mapQuery: 'Domo Business São Bernardo do Campo',
+  address: 'Edifício Domo Business, Torre B · R. José Versolato, 111, sala 821 · Centro, São Bernardo do Campo/SP · 09750-730',
+  reference: 'Ao lado do Shopping Metrópole · Estacionamento no local',
+  mapQuery: 'R. José Versolato, 111, Centro, São Bernardo do Campo - SP, 09750-730',
   hours: 'Horários a confirmar',
   rt: 'Responsável técnico: nome, CRM e RQE a confirmar',
 };
@@ -19,7 +20,6 @@ const NAV = [
   ['nutrologia.html', 'Nutrologia', 'nutrologia'],
   ['recovery.html', 'Recovery', 'recovery'],
   ['clubes-vip.html', 'Clubes VIP', 'clubes'],
-  ['equipe.html', 'Equipe', 'equipe'],
 ];
 
 const SPECIALTIES = ['Dermatologia', 'Natural Face', 'Natural Lift', 'Nutrologia', 'NeuroMap', 'Recovery', 'Clubes VIP'];
@@ -72,7 +72,7 @@ function renderShell() {
     <div class="cursor" aria-hidden="true"><span class="cursor__ring"></span><span class="cursor__dot"></span><span class="cursor__label"></span></div>
     <header class="header">
       <div class="container header__inner">
-        <a class="logo" href="index.html" aria-label="Feel Alive — página inicial">
+        <a class="logo" href="index.html" aria-label="Feel Alive, página inicial">
           <span class="logo__name">FEEL ALIVE</span><span class="logo__sub">DERMATOLOGIA E NUTROLOGIA</span>
         </a>
         <nav class="nav" aria-label="Principal">${links}</nav>
@@ -107,6 +107,7 @@ function renderShell() {
           </ul></div>
           <div><h4>Visite</h4><ul>
             <li>${CONFIG.address}</li>
+            <li>${CONFIG.reference}</li>
             <li>${CONFIG.hours}</li>
             <li><a href="${waLink(`Olá! Vim pelo site (${pageName}) e gostaria de falar com a equipe Feel Alive.`)}" target="_blank" rel="noopener">WhatsApp</a></li>
           </ul></div>
@@ -237,7 +238,7 @@ function curtainIntro(onDone) {
    ========================================================================== */
 async function sampleLogo(spans) {
   try {
-    await Promise.race([document.fonts.load('300 64px Montserrat'), new Promise((r) => setTimeout(r, 1200))]);
+    await Promise.race([document.fonts.load('300 64px Manrope'), new Promise((r) => setTimeout(r, 1200))]);
   } catch { /* segue com a fonte disponível */ }
   const w = innerWidth, h = innerHeight;
   const c = document.createElement('canvas');
@@ -605,13 +606,12 @@ function initTilt() {
 }
 
 /* ==========================================================================
-   Loop de rolagem: parallax, texto preenchido, horizontal, assinatura
+   Loop de rolagem: parallax, texto preenchido, assinatura
    ========================================================================== */
 function initScrollScenes() {
   const parallax = $$('[data-parallax]');
   const fills = $$('[data-fill]');
   fills.forEach(splitFill);
-  const hs = $$('[data-hscroll]');
   const sig = $('.signature__word');
   const sigLetters = sig ? [...sig.children] : [];
   const skews = $$('[data-skew]');
@@ -623,14 +623,6 @@ function initScrollScenes() {
   });
   let lastY = scrollY;
   let vel = 0;
-
-  const sizeHs = () => hs.forEach((sec) => {
-    const track = $('.hs__track', sec);
-    sec.style.height = isDesktop() ? `${track.scrollWidth - innerWidth + innerHeight}px` : '';
-  });
-  sizeHs();
-  addEventListener('resize', sizeHs);
-  addEventListener('load', sizeHs);
 
   const update = () => {
     const vh = innerHeight;
@@ -668,23 +660,6 @@ function initScrollScenes() {
       z.style.setProperty('--zp', easeInOut(clamp(p * 1.2)).toFixed(4));
     });
 
-    hs.forEach((sec) => {
-      const track = $('.hs__track', sec);
-      if (!isDesktop()) return;
-      const r = sec.getBoundingClientRect();
-      const p = clamp(-r.top / (sec.offsetHeight - vh));
-      track.style.transform = `translate3d(${-p * (track.scrollWidth - innerWidth)}px, 0, 0)`;
-      sec.style.setProperty('--hp', p);
-      if (reduced) return;
-      // cards giram em 3D conforme a posição na tela (efeito "coverflow")
-      $$('.proto', track).forEach((card) => {
-        const cr = card.getBoundingClientRect();
-        const off = (cr.left + cr.width / 2 - innerWidth / 2) / innerWidth;
-        card.style.setProperty('--ry', `${(off * -22).toFixed(2)}deg`);
-        card.style.setProperty('--sk', `${(-skew * 1.6).toFixed(2)}deg`);
-      });
-    });
-
     if (sig && !reduced) {
       const r = sig.getBoundingClientRect();
       const p = clamp(1 - (r.top - vh * .25) / (vh * .75));
@@ -703,17 +678,83 @@ function initScrollScenes() {
 }
 
 /* ==========================================================================
+   Carrossel com setas (protocolos)
+   ========================================================================== */
+function initCarousel() {
+  $$('[data-carousel]').forEach((root) => {
+    const track = $('.carousel__track', root);
+    const prev = $('[data-prev]', root);
+    const next = $('[data-next]', root);
+    const step = () => {
+      const card = track.firstElementChild;
+      return card ? card.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0) : track.clientWidth * .8;
+    };
+    const sync = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      prev.disabled = track.scrollLeft < 4;
+      next.disabled = track.scrollLeft > max - 4;
+      root.style.setProperty('--cp', max > 0 ? (track.scrollLeft / max).toFixed(3) : 1);
+    };
+    const go = (dir) => track.scrollBy({ left: dir * step(), behavior: reduced ? 'auto' : 'smooth' });
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    track.addEventListener('scroll', sync, { passive: true });
+    addEventListener('resize', sync);
+    addEventListener('load', sync);
+    sync();
+  });
+}
+
+/* ==========================================================================
+   Fotos opcionais: <img data-optional> aparece só se o arquivo existir
+   ========================================================================== */
+function initOptionalImages() {
+  $$('img[data-optional]').forEach((img) => {
+    const ok = () => { img.classList.add('is-ok'); img.parentElement.classList.add('has-photo'); };
+    if (img.complete && img.naturalWidth) ok();
+    else if (img.complete) img.remove();
+    else {
+      img.addEventListener('load', ok, { once: true });
+      img.addEventListener('error', () => img.remove(), { once: true });
+    }
+  });
+}
+
+/* Antes e depois: o range controla a posição do corte */
+function initBeforeAfter() {
+  $$('.ba').forEach((ba) => {
+    const input = $('input', ba);
+    const set = () => ba.style.setProperty('--pos', `${input.value}%`);
+    input.addEventListener('input', set);
+    set();
+  });
+}
+
+/* ==========================================================================
    Vídeos opcionais: injeta <video> se o arquivo existir; senão mantém o visual
    ========================================================================== */
 function initVideos() {
-  if (reduced) return;
   $$('[data-video]').forEach((box) => {
+    // data-video-controls: vídeo com som e controles (ex.: Dra. Bony), a foto vira capa
+    const controls = box.hasAttribute('data-video-controls');
+    if (reduced && !controls) return;
     const v = document.createElement('video');
-    Object.assign(v, { muted: true, loop: !box.hasAttribute('data-video-once'), playsInline: true, autoplay: true, preload: 'metadata' });
-    v.setAttribute('muted', '');
-    v.setAttribute('aria-hidden', 'true');
+    if (controls) {
+      Object.assign(v, { controls: true, playsInline: true, preload: 'metadata' });
+      const poster = $('img', box);
+      if (poster) v.poster = poster.src;
+    } else {
+      Object.assign(v, { muted: true, loop: !box.hasAttribute('data-video-once'), playsInline: true, autoplay: true, preload: 'metadata' });
+      v.setAttribute('muted', '');
+      v.setAttribute('aria-hidden', 'true');
+    }
     v.src = box.dataset.video;
-    v.addEventListener('loadeddata', () => { box.append(v); box.classList.add('has-video'); box.dispatchEvent(new CustomEvent('video', { detail: v })); v.play().catch(() => {}); }, { once: true });
+    v.addEventListener(controls ? 'loadedmetadata' : 'loadeddata', () => {
+      box.append(v);
+      box.classList.add('has-video');
+      box.dispatchEvent(new CustomEvent('video', { detail: v }));
+      if (!controls) v.play().catch(() => {});
+    }, { once: true });
     v.addEventListener('error', () => v.remove(), { once: true });
   });
 }
@@ -948,40 +989,49 @@ function initNetwork() {
 }
 
 /* ==========================================================================
-   Som ambiente (Recovery) — água gerada por Web Audio, opcional
+   Som ambiente (Recovery): música do YouTube em loop, player fora da vista
    ========================================================================== */
+const SOUND_VIDEO = 'a0SMO6ca6DY';
 function initSound() {
   const btn = $('[data-sound]');
   if (!btn) return;
-  let ctx, gain;
-  btn.addEventListener('click', async () => {
-    if (!ctx) {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const len = ctx.sampleRate * 4;
-      const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-      for (let ch = 0; ch < 2; ch++) {
-        const d = buf.getChannelData(ch);
-        let last = 0;
-        for (let i = 0; i < len; i++) { last = (last + .02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.2; }
-      }
-      const src = ctx.createBufferSource();
-      src.buffer = buf; src.loop = true;
-      const lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass'; lp.frequency.value = 700;
-      const lfo = ctx.createOscillator();
-      const lfoGain = ctx.createGain();
-      lfo.frequency.value = .08; lfoGain.gain.value = 300;
-      lfo.connect(lfoGain).connect(lp.frequency);
-      gain = ctx.createGain(); gain.gain.value = 0;
-      src.connect(lp).connect(gain).connect(ctx.destination);
-      src.start(); lfo.start();
-    }
-    const on = !btn.classList.contains('is-on');
-    if (ctx.state === 'suspended') await ctx.resume();
-    gain.gain.setTargetAtTime(on ? .35 : 0, ctx.currentTime, .6);
-    btn.classList.toggle('is-on', on);
-    btn.setAttribute('aria-pressed', on);
-    $('.sound-btn__txt', btn).textContent = on ? 'Som ambiente ligado' : 'Ativar som ambiente';
+  let player = null;
+  let ready = false;
+  let wanted = false;
+  const apply = () => {
+    if (!ready) return;
+    if (wanted) { player.setVolume(40); player.playVideo(); } else player.pauseVideo();
+  };
+  // o player é criado antes do clique para o play acontecer dentro do gesto (exigência do iOS)
+  const load = () => {
+    if (player) return;
+    const box = document.createElement('div');
+    box.className = 'sound-yt';
+    box.innerHTML = '<div id="sound-yt"></div>';
+    document.body.append(box);
+    const create = () => {
+      player = new YT.Player('sound-yt', {
+        videoId: SOUND_VIDEO,
+        playerVars: { controls: 0, loop: 1, playlist: SOUND_VIDEO, playsinline: 1, rel: 0 },
+        events: { onReady: () => { ready = true; apply(); } },
+      });
+    };
+    if (window.YT?.Player) { create(); return; }
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { prev?.(); create(); };
+    const sc = document.createElement('script');
+    sc.src = 'https://www.youtube.com/iframe_api';
+    document.head.append(sc);
+    player = {}; // marca como carregando
+  };
+  new IntersectionObserver(([e], io) => { if (e.isIntersecting) { load(); io.disconnect(); } }).observe(btn);
+  btn.addEventListener('click', () => {
+    load();
+    wanted = !btn.classList.contains('is-on');
+    apply();
+    btn.classList.toggle('is-on', wanted);
+    btn.setAttribute('aria-pressed', wanted);
+    $('.sound-btn__txt', btn).textContent = wanted ? 'Som ambiente ligado' : 'Ativar som ambiente';
   });
 }
 
@@ -1030,7 +1080,7 @@ function initBooking() {
     if (!form.lgpd.checked) { form.lgpd.focus(); return; }
     const esp = form.esp.value;
     const extra = form.msg.value.trim();
-    const msg = `Olá! Sou ${nome} e gostaria de agendar uma avaliação de ${esp}.\n(Origem: site — página ${pageName})${extra ? `\n\n${extra}` : ''}`;
+    const msg = `Olá! Sou ${nome} e gostaria de agendar uma avaliação de ${esp}.\n(Origem: site, página ${pageName})${extra ? `\n\n${extra}` : ''}`;
     window.open(waLink(msg), '_blank', 'noopener');
     close();
   });
@@ -1045,6 +1095,7 @@ function initWaLinks() {
   });
   $$('[data-map]').forEach((f) => { f.src = `https://www.google.com/maps?q=${encodeURIComponent(CONFIG.mapQuery)}&output=embed`; });
   $$('[data-address]').forEach((el) => { el.textContent = CONFIG.address; });
+  $$('[data-reference]').forEach((el) => { el.textContent = CONFIG.reference; });
 }
 
 /* ==========================================================================
@@ -1064,6 +1115,13 @@ function initHeroGL() {
   } catch { return null; }
 }
 
+function initWater() {
+  if (!window.FAGL || reduced) return;
+  $$('canvas[data-water]').forEach((c) => {
+    try { FAGL.water(c, { host: c.closest('a, article, section') || c, src: c.dataset.water || '' }); } catch { /* mantém o visual CSS */ }
+  });
+}
+
 function initSilk() {
   if (!window.FAGL || reduced) return;
   $$('canvas[data-silk]').forEach((c) => {
@@ -1075,12 +1133,15 @@ renderShell();
 $$('[data-split]').forEach(splitWords);
 $$('.nav__link, .btn').forEach(rollText);
 initWaLinks();
+initOptionalImages();
 initHeader();
 initSmoothScroll();
 initPageTransitions();
 initCursor();
 initVideos();
 initScrollScenes();
+initCarousel();
+initBeforeAfter();
 initTreatmentList();
 initTeam();
 initNeuro();
@@ -1091,6 +1152,7 @@ initBooking();
 initCounters();
 initLiquid();
 initSilk();
+initWater();
 const heroGL = initHeroGL();
 
 const start = () => {

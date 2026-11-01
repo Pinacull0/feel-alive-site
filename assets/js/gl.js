@@ -1,8 +1,9 @@
 /* ==========================================================================
    FEEL ALIVE — efeitos WebGL (sem bibliotecas)
    - particles: partículas douradas que formam o logo na abertura
-   - hero: foto com distorção líquida, aberração cromática e fundo fluido
+   - hero: fundo fluido com a foto revelada por cima (sem distorcer a pessoa)
    - silk: "seda dourada" animada para fundos
+   - water: superfície de água que ondula ao toque (Recovery)
    ========================================================================== */
 (() => {
   const probe = document.createElement('canvas');
@@ -58,6 +59,24 @@
       visible = e.isIntersecting;
       if (visible && !raf) raf = requestAnimationFrame(loop);
     }).observe(canvas);
+  }
+
+  /* Carrega uma imagem como textura; file:// bloqueia e o erro é ignorado */
+  function loadTexture(gl, src, onReady) {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+        onReady([img.naturalWidth, img.naturalHeight]);
+      } catch { /* sem textura: segue o fallback */ }
+    };
+    img.src = src;
   }
 
   const QUAD_VS = 'attribute vec2 aPos; void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
@@ -168,14 +187,14 @@
   }
 
   /* ------------------------------------------------------------------------
-     Hero: foto com distorção líquida + fundo fluido
+     Hero: fundo fluido + foto nítida (o efeito fica no fundo, nunca no rosto)
      ------------------------------------------------------------------------ */
   const HERO_FS = `
     precision highp float;
     uniform sampler2D uTex;
     uniform vec2 uRes, uImg, uMouse;
     uniform vec4 uRect;
-    uniform float uVel, uTime, uScroll, uReveal, uHasTex, uFadeL, uDim;
+    uniform float uTime, uScroll, uReveal, uHasTex, uFadeL, uDim;
     ${NOISE}
     void main(){
       vec2 frag = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
@@ -199,18 +218,7 @@
         if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr + (1.0 - fr) * 0.1; }
         else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.5; }
         uv = (uv - vec2(0.5, 0.2)) * (1.0 - uScroll * 0.1) + vec2(0.5, 0.2);
-
-        float ripple = sin(dist * 55.0 - uTime * 3.5) * 0.5 + 0.5;
-        vec2 dir = dm / (length(dm) + 1.0);
-        float k = infl * (0.25 + uVel * 1.6);
-        vec2 off = -dir * k * 0.018 * ripple;
-        off += (vec2(fbm(local * 5.0 + uTime * 0.3), fbm(local * 5.0 - uTime * 0.3)) - 0.5) * k * 0.03;
-        off += vec2(0.0, sin(uTime * 0.6 + local.y * 3.0) * 0.0015);
-        float ca = 0.0012 + k * 0.01;
-        vec3 img;
-        img.r = texture2D(uTex, uv + off + dir * ca).r;
-        img.g = texture2D(uTex, uv + off).g;
-        img.b = texture2D(uTex, uv + off - dir * ca).b;
+        vec3 img = texture2D(uTex, uv).rgb;
 
         float inside = step(0.0, local.x) * step(local.x, 1.0) * step(0.0, local.y) * step(local.y, 1.0);
         float mask = inside * smoothstep(0.0, max(uFadeL, 0.001), local.x) * smoothstep(1.0, 0.62, local.y);
@@ -234,27 +242,16 @@
     if (!gl) return null;
     const p = program(gl, QUAD_VS, HERO_FS);
     fullQuad(gl, p);
-    const u = uniforms(gl, p, ['uTex', 'uRes', 'uImg', 'uMouse', 'uRect', 'uVel', 'uTime', 'uScroll', 'uReveal', 'uHasTex', 'uFadeL', 'uDim']);
+    const u = uniforms(gl, p, ['uTex', 'uRes', 'uImg', 'uMouse', 'uRect', 'uTime', 'uScroll', 'uReveal', 'uHasTex', 'uFadeL', 'uDim']);
     let hasTex = 0;
     let imgSize = [1, 1];
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const tex = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
-        imgSize = [img.naturalWidth, img.naturalHeight];
-        hasTex = 1;
-        onTexture?.();
-      } catch { /* file:// bloqueia texturas: a foto em DOM continua visível */ }
-    };
-    img.src = src;
+    loadTexture(gl, src, (size) => {
+      imgSize = size;
+      hasTex = 1;
+      onTexture?.();
+    });
 
-    const mouse = { x: -9999, y: -9999, px: -9999, py: -9999, vel: 0 };
+    const mouse = { x: -9999, y: -9999 };
     addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
     const sm = { x: -9999, y: -9999 };
     const state = { revealStart: null };
@@ -268,15 +265,11 @@
       if (sm.x < -999) { sm.x = mouse.x; sm.y = mouse.y; }
       sm.x += (mouse.x - sm.x) * 0.12;
       sm.y += (mouse.y - sm.y) * 0.12;
-      const v = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
-      mouse.vel += (Math.min(v / 60, 1) - mouse.vel) * 0.08;
-      mouse.px = mouse.x; mouse.py = mouse.y;
       const rev = state.revealStart === null ? 0 : Math.min(1, (now - state.revealStart) / 2200);
       gl.uniform2f(u.uRes, canvas.width, canvas.height);
       gl.uniform4f(u.uRect, (pr.left - cr.left) * dpr, (pr.top - cr.top) * dpr, pr.width * dpr, pr.height * dpr);
       gl.uniform2f(u.uImg, imgSize[0], imgSize[1]);
       gl.uniform2f(u.uMouse, (sm.x - cr.left) * dpr, (sm.y - cr.top) * dpr);
-      gl.uniform1f(u.uVel, mouse.vel);
       gl.uniform1f(u.uTime, (now - t0) / 1000);
       gl.uniform1f(u.uScroll, Math.min(1, Math.max(0, -cr.top / cr.height)));
       gl.uniform1f(u.uReveal, 1 - Math.pow(1 - rev, 3));
@@ -341,5 +334,116 @@
     canvas.classList.add('is-gl');
   }
 
-  window.FAGL = { particles, hero, silk };
+  /* ------------------------------------------------------------------------
+     Água: ondas circulares a cada toque, refratando a foto (se houver)
+     ou um fundo de água escura com cáusticas douradas
+     ------------------------------------------------------------------------ */
+  const DROPS = 12;
+  const WATER_FS = `
+    precision highp float;
+    uniform sampler2D uTex;
+    uniform vec2 uRes, uImg;
+    uniform float uTime, uHasTex;
+    uniform vec4 uDrops[${DROPS}];
+    ${NOISE}
+    float height(vec2 p){
+      float h = (fbm(p * 2.6 + vec2(uTime * 0.06, -uTime * 0.05)) - 0.5) * 0.012;
+      for (int i = 0; i < ${DROPS}; i++) {
+        vec4 d = uDrops[i];
+        float age = uTime - d.z;
+        if (age < 0.0 || age > 5.0) continue;
+        float x = length(p - d.xy) - age * 0.32;
+        h += d.w * 0.0045 * sin(x * 70.0) * exp(-x * x * 160.0) * exp(-age * 0.9);
+      }
+      return h;
+    }
+    float caustic(vec2 uv, float t){
+      vec2 p = uv * 6.2831 - 250.0;
+      vec2 i = p;
+      float c = 1.0;
+      for (int n = 0; n < 4; n++) {
+        float tt = t * (1.0 - 3.5 / float(n + 1));
+        i = p + vec2(cos(tt - i.x) + sin(tt + i.y), sin(tt - i.y) + cos(tt + i.x));
+        c += 1.0 / length(vec2(p.x / (sin(i.x + tt) / 0.005), p.y / (cos(i.y + tt) / 0.005)));
+      }
+      c = 1.17 - pow(c / 4.0, 1.4);
+      return pow(abs(c), 8.0);
+    }
+    void main(){
+      vec2 frag = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+      vec2 p = frag / uRes.y;
+      float e = 1.5 / uRes.y;
+      float h = height(p);
+      vec2 g = vec2(height(p + vec2(e, 0.0)) - h, height(p + vec2(0.0, e)) - h) / e;
+      vec3 n = normalize(vec3(-g, 1.0));
+      vec2 off = n.xy * 0.06;
+      vec3 col;
+      if (uHasTex > 0.5) {
+        vec2 local = frag / uRes + off;
+        float rA = uRes.x / uRes.y, iA = uImg.x / uImg.y;
+        vec2 uv = local;
+        if (rA > iA) uv.y = (local.y - 0.5) * iA / rA + 0.5;
+        else uv.x = (local.x - 0.5) * rA / iA + 0.5;
+        col = texture2D(uTex, uv).rgb;
+      } else {
+        vec2 q = p + off;
+        col = mix(vec3(0.02, 0.045, 0.05), vec3(0.04, 0.1, 0.11), fbm(q * 1.8 + uTime * 0.03));
+        col += vec3(0.894, 0.75, 0.4) * caustic(q * 0.9, uTime * 0.35 + 23.0) * 0.32;
+      }
+      vec3 L = normalize(vec3(-0.45, -0.55, 1.0));
+      float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 70.0);
+      col += vec3(1.0, 0.9, 0.62) * spec * 0.7;
+      col += vec3(0.894, 0.71, 0.192) * clamp(length(g) * 0.8, 0.0, 1.0) * 0.12;
+      vec2 v = frag / uRes - 0.5;
+      col *= 1.0 - dot(v, v) * 0.6;
+      col += (hash(frag + fract(uTime) * 77.0) - 0.5) * 0.03;
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+
+  function water(canvas, { host = canvas, src } = {}) {
+    const gl = ctx(canvas, { alpha: false });
+    if (!gl) return;
+    const p = program(gl, QUAD_VS, WATER_FS);
+    fullQuad(gl, p);
+    const u = uniforms(gl, p, ['uTex', 'uRes', 'uImg', 'uTime', 'uHasTex', 'uDrops']);
+    let hasTex = 0;
+    let imgSize = [1, 1];
+    if (src) loadTexture(gl, src, (size) => { imgSize = size; hasTex = 1; });
+
+    const t0 = performance.now();
+    const now = () => (performance.now() - t0) / 1000;
+    const drops = new Float32Array(DROPS * 4).fill(-99);
+    let next = 0;
+    let last = { x: -9, y: -9, t: -9 };
+    const drop = (x, y, amp) => {
+      drops.set([x, y, now(), amp], next * 4);
+      next = (next + 1) % DROPS;
+      last = { x, y, t: now() };
+    };
+    const local = (e) => {
+      const r = canvas.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.height, (e.clientY - r.top) / r.height];
+    };
+    host.addEventListener('pointermove', (e) => {
+      const [x, y] = local(e);
+      if (Math.hypot(x - last.x, y - last.y) > 0.05 && now() - last.t > 0.06) drop(x, y, 0.7);
+    }, { passive: true });
+    host.addEventListener('pointerdown', (e) => { const [x, y] = local(e); drop(x, y, 1.6); }, { passive: true });
+
+    loopWhenVisible(canvas, () => {
+      fit(canvas, 1.25);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      // sem interação, uma gota de vez em quando para a água não ficar parada
+      if (now() - last.t > 2.6) drop(Math.random() * canvas.width / canvas.height, 0.2 + Math.random() * 0.6, 0.45);
+      gl.uniform2f(u.uRes, canvas.width, canvas.height);
+      gl.uniform2f(u.uImg, imgSize[0], imgSize[1]);
+      gl.uniform1f(u.uTime, now());
+      gl.uniform1f(u.uHasTex, hasTex);
+      gl.uniform4fv(u.uDrops, drops);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    });
+    canvas.classList.add('is-gl');
+  }
+
+  window.FAGL = { particles, hero, silk, water };
 })();
