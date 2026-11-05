@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261105">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js" defer></script>
-  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/gl.js?v=20261105" defer></script>
+  <script src="assets/js/main.js?v=20261105" defer></script>
 </head>
 <body data-page="estetica">
 <main id="conteudo">
@@ -43,7 +43,7 @@
         <p class="lead" data-reveal>Seu olhar para a dermatologia acolhe quem passou anos priorizando a família e o trabalho e agora deseja reservar mais tempo para si.</p>
         <p class="small" data-reveal>Dermatologista e cofundadora da Feel Alive com o Dr. Guilherme. <span class="validate">CRM / RQE a confirmar.</span></p>
       </div>
-      <div class="portrait img-reveal" data-video="assets/video/dra-bony.mp4" data-video-controls><img src="assets/img/dra-bony.jpg" alt="Retrato da Dra. Bony Lara" loading="lazy"><span class="portrait__line"></span></div>
+      <div class="portrait portrait--video img-reveal" data-video="assets/video/dra-bony.mp4" data-video-controls><img src="assets/img/dra-bony-video.jpg" alt="Dra. Bony Lara recebendo uma paciente na Feel Alive" loading="lazy"><span class="portrait__line"></span></div>
     </div>
   </section>
 
@@ -128,39 +128,26 @@
         <h2 class="h2" id="ba-t" data-split>Resultados que preservam <em>quem você é.</em></h2>
         <p class="lead" data-reveal>Arraste para comparar. Casos reais de pacientes da Feel Alive, publicados com autorização.</p>
       </div>
-      <div class="ba-grid" data-reveal>
+      <div class="ba-grid ba-grid--2" data-reveal>
         <figure class="ba-case">
           <div class="ba">
-            <div class="ba__ph" aria-hidden="true"><i>antes</i><i>depois</i></div>
-            <img class="ba__img" data-optional src="assets/img/antes-depois/natural-face-antes.jpg" alt="Natural Face: antes" loading="lazy">
-            <img class="ba__img ba__after" data-optional src="assets/img/antes-depois/natural-face-depois.jpg" alt="Natural Face: depois" loading="lazy">
+            <img class="ba__img" src="assets/img/antes-depois/rinomodelacao-perfil-antes.jpg" alt="Rinomodelação: antes" loading="lazy">
+            <img class="ba__img ba__after" src="assets/img/antes-depois/rinomodelacao-perfil-depois.jpg" alt="Rinomodelação: depois" loading="lazy">
             <span class="ba__label ba__label--a">Antes</span><span class="ba__label ba__label--b">Depois</span>
-            <input type="range" min="0" max="100" value="50" aria-label="Comparar antes e depois: Natural Face">
+            <input type="range" min="0" max="100" value="50" aria-label="Comparar antes e depois: Rinomodelação">
             <span class="ba__handle" aria-hidden="true"></span>
           </div>
-          <figcaption><b>Natural Face</b><span>Planejamento facial individualizado</span></figcaption>
+          <figcaption><b>Rinomodelação</b><span>Vista de perfil</span></figcaption>
         </figure>
         <figure class="ba-case">
           <div class="ba">
-            <div class="ba__ph" aria-hidden="true"><i>antes</i><i>depois</i></div>
-            <img class="ba__img" data-optional src="assets/img/antes-depois/natural-lift-antes.jpg" alt="Natural Lift: antes" loading="lazy">
-            <img class="ba__img ba__after" data-optional src="assets/img/antes-depois/natural-lift-depois.jpg" alt="Natural Lift: depois" loading="lazy">
+            <img class="ba__img" src="assets/img/antes-depois/rinomodelacao-frente-antes.jpg" alt="Rinomodelação: antes" loading="lazy">
+            <img class="ba__img ba__after" src="assets/img/antes-depois/rinomodelacao-frente-depois.jpg" alt="Rinomodelação: depois" loading="lazy">
             <span class="ba__label ba__label--a">Antes</span><span class="ba__label ba__label--b">Depois</span>
-            <input type="range" min="0" max="100" value="50" aria-label="Comparar antes e depois: Natural Lift">
+            <input type="range" min="0" max="100" value="50" aria-label="Comparar antes e depois: Rinomodelação">
             <span class="ba__handle" aria-hidden="true"></span>
           </div>
-          <figcaption><b>Natural Lift</b><span>Firmeza e sustentação com tecnologias</span></figcaption>
-        </figure>
-        <figure class="ba-case">
-          <div class="ba">
-            <div class="ba__ph" aria-hidden="true"><i>antes</i><i>depois</i></div>
-            <img class="ba__img" data-optional src="assets/img/antes-depois/qualidade-pele-antes.jpg" alt="Qualidade da pele: antes" loading="lazy">
-            <img class="ba__img ba__after" data-optional src="assets/img/antes-depois/qualidade-pele-depois.jpg" alt="Qualidade da pele: depois" loading="lazy">
-            <span class="ba__label ba__label--a">Antes</span><span class="ba__label ba__label--b">Depois</span>
-            <input type="range" min="0" max="100" value="50" aria-label="Comparar antes e depois: Qualidade da pele">
-            <span class="ba__handle" aria-hidden="true"></span>
-          </div>
-          <figcaption><b>Qualidade da pele</b><span>Protocolo conforme avaliação</span></figcaption>
+          <figcaption><b>Rinomodelação</b><span>Vista em três quartos</span></figcaption>
         </figure>
       </div>
       <p class="small" style="margin-top:28px;max-width:70ch" data-reveal>Imagens divulgadas com consentimento das pacientes, sem tratamento digital. Os resultados variam de pessoa para pessoa e dependem de avaliação médica.</p>

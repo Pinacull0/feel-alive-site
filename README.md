@@ -26,14 +26,23 @@ Basta colocar os arquivos em `assets/video/` com estes nomes. Eles são carregad
 - `abertura.mp4`: filme de 18 s. Os capítulos do hero sincronizam com o tempo do vídeo
 - `estetica.mp4`, `saude.mp4`, `recovery.mp4`: loops dos pilares
 
-## Fotos
-Mesma ideia dos vídeos: salve com o nome abaixo e a foto aparece sozinha. Sem o arquivo, fica o visual atual.
-- `assets/img/dr-guilherme.jpg`: Dr. Guilherme (Home, Nutrologia)
-- `assets/img/equipe-dermatologia.jpg`, `assets/img/equipe-nutricao.jpg`: cards da equipe na Home
-- `assets/img/fundadores.jpg`: Dra. Bony e Dr. Guilherme juntos, acima das duas colunas em A Clínica
-- `assets/img/protocolo-natural-face.jpg`, `protocolo-natural-lift.jpg`, `protocolo-neuromap.jpg`: cards de protocolos da Home
-- `assets/img/clubes-vip.jpg`: faixa Clubes VIP da Home; `assets/img/clubes-vip-hero.jpg`: topo da página Clubes VIP
-- `assets/img/clinica-espaco.jpg`: "Venha conhecer" (fica no lugar do mapa)
-- `assets/img/recovery-sauna.jpg`, `recovery-led.jpg`, `recovery-massoterapia.jpg`: cards do circuito; `recovery-imersao.jpg` vira a água que ondula ao toque
-- `assets/img/antes-depois/{natural-face,natural-lift,qualidade-pele}-{antes,depois}.jpg`: comparadores de Estética (só com autorização escrita da paciente)
-- `assets/video/dra-bony.mp4`: vídeo com som e controles ao lado de "Sua beleza não precisa deixar sua história para trás"
+## Fotos e vídeos
+Uma foto marcada com `data-optional` só aparece se o arquivo existir. Para trocar uma foto, basta substituir o arquivo mantendo o nome. Os originais enviados pela clínica ficam fora do site, em `../feel-alive-midias-originais/`.
+
+| Arquivo | Onde aparece | Original |
+|---|---|---|
+| `img/fundadores.jpg` | A Clínica, acima das duas colunas | DSC01299 |
+| `img/dr-guilherme.jpg` | Card da equipe na Home | DSC00566 |
+| `img/dr-guilherme-retrato.jpg` | Nutrologia | DSC05793 |
+| `img/equipe-dermatologia.jpg` | Card "Dermatologistas" na Home | DSC05226 |
+| `img/equipe-nutricao.jpg` | Card "Nutrição" na Home | IMG_0854 |
+| `img/protocolo-natural-face.jpg`, `protocolo-natural-lift.jpg`, `protocolo-neuromap.jpg` | Cards de protocolos da Home | DSC03597, DSC03594, DSC05731 |
+| `img/clubes-vip.jpg` | Faixa Clubes VIP da Home | unnamed.webp |
+| `img/clubes-vip-hero.jpg` | Topo da página Clubes VIP | DSC07184 |
+| `img/clinica-espaco.jpg` | "Venha conhecer" (no lugar do mapa) | WhatsApp Image 2026-10-26 |
+| `img/recovery-sauna.jpg` | Card Sauna | DSC01111 |
+| `video/recovery-imersao.mp4`, `recovery-led.mp4`, `recovery-pressoterapia.mp4` (+ capa `.jpg` em `img/`) | Cards Imersão fria, Terapia de LED e Massoterapia | C0024, C0045, C0043 (girados, 12 s, sem som) |
+| `video/dra-bony.mp4` | Estética, ao lado de "Sua beleza não precisa deixar sua história para trás" | copy_17D7F39E….mov |
+| `img/antes-depois/rinomodelacao-{perfil,frente}-{antes,depois}.jpg` | Antes e depois em Estética | Foto 10-08-2026 (colagem recortada) |
+
+Sem uso por enquanto: DSC07599 (foto em grupo do evento) e IMG_0191. As fotos de antes e depois só podem ser publicadas com autorização escrita da paciente.

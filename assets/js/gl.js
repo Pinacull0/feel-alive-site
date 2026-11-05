@@ -215,9 +215,9 @@
         vec2 local = (frag - uRect.xy) / uRect.zw;
         float rA = uRect.z / uRect.w, iA = uImg.x / uImg.y;
         vec2 uv = local;
-        if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr + (1.0 - fr) * 0.1; }
+        if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr; }
         else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.5; }
-        uv = (uv - vec2(0.5, 0.2)) * (1.0 - uScroll * 0.1) + vec2(0.5, 0.2);
+        uv = (uv - vec2(0.5, 0.0)) * (1.0 - uScroll * 0.1) + vec2(0.5, 0.0);
         vec3 img = texture2D(uTex, uv).rgb;
 
         float inside = step(0.0, local.x) * step(local.x, 1.0) * step(0.0, local.y) * step(local.y, 1.0);

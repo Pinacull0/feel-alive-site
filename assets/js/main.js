@@ -456,7 +456,22 @@ function initReveals() {
       io.unobserve(e.target);
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: .12 });
-  targets.forEach((t) => io.observe(t));
+  // .img-reveal começa com clip-path de área zero, que o Chrome trata como fora da tela:
+  // observa o pai (sem recorte) e revela a imagem quando ele entra
+  const hosts = new Map();
+  const hostIo = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      hosts.get(e.target).forEach((t) => t.classList.add('is-in'));
+      hostIo.unobserve(e.target);
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0 });
+  targets.forEach((t) => {
+    if (!t.classList.contains('img-reveal')) { io.observe(t); return; }
+    const host = t.parentElement;
+    if (!hosts.has(host)) { hosts.set(host, []); hostIo.observe(host); }
+    hosts.get(host).push(t);
+  });
 }
 
 /* ==========================================================================
@@ -705,21 +720,6 @@ function initCarousel() {
   });
 }
 
-/* ==========================================================================
-   Fotos opcionais: <img data-optional> aparece só se o arquivo existir
-   ========================================================================== */
-function initOptionalImages() {
-  $$('img[data-optional]').forEach((img) => {
-    const ok = () => { img.classList.add('is-ok'); img.parentElement.classList.add('has-photo'); };
-    if (img.complete && img.naturalWidth) ok();
-    else if (img.complete) img.remove();
-    else {
-      img.addEventListener('load', ok, { once: true });
-      img.addEventListener('error', () => img.remove(), { once: true });
-    }
-  });
-}
-
 /* Antes e depois: o range controla a posição do corte */
 function initBeforeAfter() {
   $$('.ba').forEach((ba) => {
@@ -737,6 +737,8 @@ function initVideos() {
   $$('[data-video]').forEach((box) => {
     // data-video-controls: vídeo com som e controles (ex.: Dra. Bony), a foto vira capa
     const controls = box.hasAttribute('data-video-controls');
+    // data-poster: quadro do vídeo como fundo enquanto carrega (e com movimento reduzido)
+    if (box.dataset.poster) box.style.background = `50% 30% / cover no-repeat url("${box.dataset.poster}")`;
     if (reduced && !controls) return;
     const v = document.createElement('video');
     if (controls) {
@@ -1133,7 +1135,6 @@ renderShell();
 $$('[data-split]').forEach(splitWords);
 $$('.nav__link, .btn').forEach(rollText);
 initWaLinks();
-initOptionalImages();
 initHeader();
 initSmoothScroll();
 initPageTransitions();

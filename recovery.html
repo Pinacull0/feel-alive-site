@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261105">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js" defer></script>
-  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/gl.js?v=20261105" defer></script>
+  <script src="assets/js/main.js?v=20261105" defer></script>
 </head>
 <body data-page="recovery">
 <main id="conteudo">
@@ -50,23 +50,23 @@
       </div>
       <div class="rec-grid" data-skew>
         <article class="rec rec--sauna" data-reveal>
-          <img class="rec__photo" data-optional src="assets/img/recovery-sauna.jpg" alt="" loading="lazy">
+          <img class="rec__photo" src="assets/img/recovery-sauna.jpg" alt="" loading="lazy">
           <div class="rec__vis"><div class="steam"><i></i><i></i><i></i></div></div>
           <h3>Sauna</h3><p>Vapor, temperatura, pausa e orientação.</p>
         </article>
         <article class="rec rec--cold" data-reveal style="--d:100ms">
           <div class="rec__vis vis--recovery" style="position:absolute;inset:0"><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span></div>
-          <canvas data-water="assets/img/recovery-imersao.jpg" aria-hidden="true" style="z-index:-1"></canvas>
-          <h3>Imersão fria</h3><p>Água em movimento, imersão e segurança. Toque na água.</p>
+          <div class="rec__media" data-video="assets/video/recovery-imersao.mp4" data-poster="assets/img/recovery-imersao.jpg"></div>
+          <h3>Imersão fria</h3><p>Água em movimento, imersão e segurança.</p>
         </article>
         <article class="rec rec--led" data-reveal>
-          <img class="rec__photo" data-optional src="assets/img/recovery-led.jpg" alt="" loading="lazy">
           <div class="rec__vis"></div>
+          <div class="rec__media" data-video="assets/video/recovery-led.mp4" data-poster="assets/img/recovery-led.jpg"></div>
           <h3>Terapia de LED</h3><p>Luz e ambiente de relaxamento.</p>
         </article>
         <article class="rec rec--massage" data-reveal style="--d:100ms">
-          <img class="rec__photo" data-optional src="assets/img/recovery-massoterapia.jpg" alt="" loading="lazy">
           <div class="rec__vis"></div>
+          <div class="rec__media" data-video="assets/video/recovery-pressoterapia.mp4" data-poster="assets/img/recovery-pressoterapia.jpg"></div>
           <h3>Massoterapia</h3><p>Contato, cuidado e sensação de pausa.</p>
         </article>
       </div>
