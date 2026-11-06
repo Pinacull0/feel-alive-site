@@ -447,7 +447,8 @@ function initLiquid() {
    Reveals por IntersectionObserver
    ========================================================================== */
 function initReveals() {
-  const targets = $$('[data-split], [data-reveal], .img-reveal');
+  // os títulos dos temas do hero são controlados pelo filme, não pela rolagem
+  const targets = $$('[data-split], [data-reveal], .img-reveal').filter((t) => !t.closest('.hero__slide'));
   if (reduced) { targets.forEach((t) => t.classList.add('is-in')); return; }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
@@ -631,6 +632,8 @@ function initScrollScenes() {
   const sigLetters = sig ? [...sig.children] : [];
   const skews = $$('[data-skew]');
   const zooms = $$('[data-zoom]');
+  // alvos das animações ligadas à rolagem (as variáveis são lidas no CSS)
+  const scrubs = reduced ? [] : $$('.section--expand, .img-reveal, .journey, .member, .proto, .rec, .care__visual, .hero, .page-hero, .section:has(> .drift)');
   const marquees = $$('.marquee').map((m) => {
     m.classList.add('is-js');
     const track = $('.marquee__track', m);
@@ -667,6 +670,14 @@ function initScrollScenes() {
       if (q.x <= -half) q.x += half;
       if (q.x > 0) q.x -= half;
       q.track.style.transform = `translate3d(${q.x}px, 0, 0) skewX(${-skew * 2}deg)`;
+    });
+
+    scrubs.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -120 || r.top > vh + 120) return;
+      el.style.setProperty('--p', clamp((vh - r.top) / (vh + r.height)).toFixed(4));
+      el.style.setProperty('--e', easeOut(clamp((vh - r.top) / (vh * .75))).toFixed(4));
+      el.style.setProperty('--x', clamp(-r.top / r.height).toFixed(4));
     });
 
     zooms.forEach((z) => {
@@ -762,45 +773,65 @@ function initVideos() {
 }
 
 /* ==========================================================================
-   Filme de abertura — capítulos de 18 segundos
+   Filme de abertura: cada tema troca o título e o texto do hero
    ========================================================================== */
+const THEME_SECONDS = 7.5;
 function initFilm() {
   const film = $('.film');
   if (!film) return;
   const chapters = $$('.film__ch', film);
-  const caption = $('.film__caption');
-  const times = chapters.map((c) => parseFloat(c.dataset.t));
-  const ends = times.slice(1).concat(18);
-  let idx = 0;
+  const slides = $$('.hero__slide');
+  let idx = -1;
   let timer = null;
   let video = null;
 
-  const set = (i, restart = true) => {
+  const show = (i) => {
+    if (i === idx) return;
+    const prev = slides[idx];
+    if (prev) {
+      prev.classList.remove('is-active', 'is-in');
+      prev.classList.add('is-out');
+      prev.setAttribute('aria-hidden', 'true');
+      prev.inert = true;
+      setTimeout(() => prev.classList.remove('is-out'), 1400);
+    }
+    const next = slides[i];
+    next.classList.add('is-active');
+    next.removeAttribute('aria-hidden');
+    next.inert = false;
+    // espera as letras do tema anterior saírem antes de entrar o novo
+    setTimeout(() => next.classList.add('is-in'), prev ? 650 : 0);
     idx = i;
+  };
+  const set = (i) => {
     chapters.forEach((c, k) => {
       c.classList.toggle('is-done', k < i);
       c.classList.remove('is-active');
-      c.style.setProperty('--dur', `${ends[k] - times[k]}s`);
+      c.style.setProperty('--dur', `${video ? video.duration / chapters.length : THEME_SECONDS}s`);
     });
     void chapters[i].offsetWidth; // reinicia a animação da barra
     chapters[i].classList.add('is-active');
-    caption.innerHTML = `<span>${chapters[i].dataset.caption}</span>`;
-    if (video && restart) video.currentTime = times[i];
+    show(i);
     if (!video) {
       clearTimeout(timer);
-      timer = setTimeout(() => set((i + 1) % chapters.length), (ends[i] - times[i]) * 1000);
+      timer = setTimeout(() => set((i + 1) % chapters.length), THEME_SECONDS * 1000);
     }
   };
-  chapters.forEach((c, i) => c.addEventListener('click', () => set(i)));
+  chapters.forEach((c, i) => c.addEventListener('click', () => {
+    if (video) video.currentTime = (video.duration / chapters.length) * i;
+    set(i);
+  }));
+  // com o filme (assets/video/abertura.mp4), os temas dividem a duração do vídeo
   $('.hero__media')?.addEventListener('video', (e) => {
     video = e.detail;
     clearTimeout(timer);
     video.addEventListener('timeupdate', () => {
-      const i = times.findLastIndex((t) => video.currentTime >= t);
-      if (i !== idx && i >= 0) set(i, false);
+      const i = Math.min(chapters.length - 1, Math.floor(video.currentTime / (video.duration / chapters.length)));
+      if (i !== idx) set(i);
     });
   });
-  if (reduced) { chapters.forEach((c) => c.classList.add('is-done')); caption.textContent = chapters[0].dataset.caption; return; }
+  slides.forEach((sl, k) => { if (k) sl.inert = true; });
+  if (reduced) { chapters.forEach((c) => c.classList.add('is-done')); show(0); return; }
   set(0);
 }
 

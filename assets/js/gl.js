@@ -1,7 +1,7 @@
 /* ==========================================================================
    FEEL ALIVE — efeitos WebGL (sem bibliotecas)
    - particles: partículas douradas que formam o logo na abertura
-   - hero: fundo fluido com a foto revelada por cima (sem distorcer a pessoa)
+   - hero: lente líquida com aberração cromática no fundo (a foto fica nítida)
    - silk: "seda dourada" animada para fundos
    - water: superfície de água que ondula ao toque (Recovery)
    ========================================================================== */
@@ -187,50 +187,79 @@
   }
 
   /* ------------------------------------------------------------------------
-     Hero: fundo fluido + foto nítida (o efeito fica no fundo, nunca no rosto)
+     Hero: lente líquida que segue o mouse, com aberração cromática, em todo o
+     fundo. A foto entra por cima depois, sem deslocamento: o efeito nunca toca a pessoa.
      ------------------------------------------------------------------------ */
   const HERO_FS = `
     precision highp float;
     uniform sampler2D uTex;
     uniform vec2 uRes, uImg, uMouse;
     uniform vec4 uRect;
-    uniform float uTime, uScroll, uReveal, uHasTex, uFadeL, uDim;
+    uniform float uVel, uTime, uScroll, uReveal, uHasTex, uFadeL, uDim;
     ${NOISE}
-    void main(){
-      vec2 frag = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
-      vec2 p = frag / uRes.y;
+    const vec3 GOLD = vec3(0.894, 0.71, 0.192);
+    vec3 background(vec2 p){
       float t = uTime * 0.05;
       vec2 q = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 + vec2(5.2, 1.3) - t));
       float n = fbm(p * 1.8 + 2.2 * q + vec2(t * 0.7, -t));
-      vec3 gold = vec3(0.894, 0.71, 0.192);
-      vec3 col = vec3(0.039) + vec3(0.09, 0.07, 0.025) * smoothstep(0.35, 0.95, n);
-      col += gold * pow(smoothstep(0.55, 1.0, n), 3.0) * 0.22;
+      vec3 col = vec3(0.035) + vec3(0.13, 0.1, 0.035) * smoothstep(0.3, 0.95, n);
+      col += GOLD * pow(smoothstep(0.5, 1.0, n), 3.0) * 0.34;
+      float streak = 0.5 + 0.5 * sin((p.x * 2.0 + q.y * 3.0 + n * 4.0) * 6.0 + uTime * 0.3);
+      return col + GOLD * pow(streak, 14.0) * 0.1 * smoothstep(0.4, 0.9, n);
+    }
+    vec3 photo(vec2 frag, vec3 col){
+      if (uHasTex < 0.5) return col;
+      vec2 local = (frag - uRect.xy) / uRect.zw;
+      float rA = uRect.z / uRect.w, iA = uImg.x / uImg.y;
+      vec2 uv = local;
+      if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr; }
+      else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.5; }
+      uv = (uv - vec2(0.5, 0.0)) * (1.0 - uScroll * 0.1) + vec2(0.5, 0.0);
+      vec3 img = texture2D(uTex, clamp(uv, 0.0, 1.0)).rgb;
+      float inside = step(0.0, local.x) * step(local.x, 1.0) * step(0.0, local.y) * step(local.y, 1.0);
+      float mask = inside * smoothstep(0.0, max(uFadeL, 0.001), local.x) * smoothstep(1.0, 0.62, local.y);
+      return mix(col, img, mask * uDim);
+    }
+    void main(){
+      vec2 frag = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+      vec2 p = frag / uRes.y;
 
+      // lente líquida em volta do mouse (mais forte quanto mais rápido o movimento)
       vec2 dm = frag - uMouse;
       float dist = length(dm) / uRes.y;
-      float infl = smoothstep(0.32, 0.0, dist);
-      col += gold * infl * infl * 0.06;
+      float infl = smoothstep(0.45, 0.0, dist);
+      float rip = sin(dist * 55.0 - uTime * 3.5) * 0.5 + 0.5;
+      vec2 dir = dm / (length(dm) + 1.0);
+      float k = infl * (0.25 + uVel * 1.6);
+      vec2 off = -dir * k * 0.018 * rip;
+      off += (vec2(fbm(p * 5.0 + uTime * 0.3), fbm(p * 5.0 - uTime * 0.3)) - 0.5) * k * 0.03;
+      off += vec2(0.0, sin(uTime * 0.6 + p.y * 3.0) * 0.0015);
+      vec2 fo = off * uRes.y;
+      float ca = (0.0012 + k * 0.01) * uRes.y;
 
-      if (uHasTex > 0.5) {
-        vec2 local = (frag - uRect.xy) / uRect.zw;
-        float rA = uRect.z / uRect.w, iA = uImg.x / uImg.y;
-        vec2 uv = local;
-        if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr; }
-        else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.5; }
-        uv = (uv - vec2(0.5, 0.0)) * (1.0 - uScroll * 0.1) + vec2(0.5, 0.0);
-        vec3 img = texture2D(uTex, uv).rgb;
-
-        float inside = step(0.0, local.x) * step(local.x, 1.0) * step(0.0, local.y) * step(local.y, 1.0);
-        float mask = inside * smoothstep(0.0, max(uFadeL, 0.001), local.x) * smoothstep(1.0, 0.62, local.y);
-        float edge = uReveal * 1.35 - (1.0 - local.y) - fbm(local * 4.0 + 3.0) * 0.35;
-        float rv = smoothstep(0.0, 0.08, edge);
-        float rim = smoothstep(0.0, 0.03, edge) - smoothstep(0.03, 0.12, edge);
-        col = mix(col, img, mask * rv * uDim);
-        col += gold * rim * inside * 0.9 * step(uReveal, 0.999);
-        float sw = fract(uTime * 0.07);
-        float band = smoothstep(0.06, 0.0, abs(local.x * 0.8 + local.y * 0.6 - sw * 2.6 + 0.3));
-        col += vec3(1.0, 0.88, 0.55) * band * mask * rv * 0.08;
+      vec3 col;
+      if (k > 0.004) {
+        col.r = background((frag + fo + dir * ca) / uRes.y).r;
+        col.g = background((frag + fo) / uRes.y).g;
+        col.b = background((frag + fo - dir * ca) / uRes.y).b;
+      } else {
+        col = background((frag + fo) / uRes.y);
       }
+      col += GOLD * infl * infl * 0.07;
+      col = photo(frag, col);
+
+      // revelação de baixo para cima com borda dourada, na tela inteira
+      vec2 sc = frag / uRes;
+      float edge = uReveal * 1.35 - (1.0 - sc.y) - fbm(sc * vec2(uRes.x / uRes.y, 1.0) * 4.0 + 3.0) * 0.35;
+      float rv = smoothstep(0.0, 0.08, edge);
+      float rim = smoothstep(0.0, 0.03, edge) - smoothstep(0.03, 0.12, edge);
+      col = mix(vec3(0.02), col, rv);
+      col += GOLD * rim * 0.9 * step(uReveal, 0.999);
+      // faixa de brilho que atravessa a tela inteira
+      float band = smoothstep(0.05, 0.0, abs(sc.x * 0.8 + sc.y * 0.6 - fract(uTime * 0.07) * 2.6 + 0.3));
+      col += vec3(1.0, 0.88, 0.55) * band * rv * 0.06;
+
+
       vec2 vv = frag / uRes - 0.5;
       col *= 1.0 - dot(vv, vv) * 0.7;
       col += (hash(frag + fract(uTime) * 100.0) - 0.5) * 0.04;
@@ -242,7 +271,7 @@
     if (!gl) return null;
     const p = program(gl, QUAD_VS, HERO_FS);
     fullQuad(gl, p);
-    const u = uniforms(gl, p, ['uTex', 'uRes', 'uImg', 'uMouse', 'uRect', 'uTime', 'uScroll', 'uReveal', 'uHasTex', 'uFadeL', 'uDim']);
+    const u = uniforms(gl, p, ['uTex', 'uRes', 'uImg', 'uMouse', 'uRect', 'uVel', 'uTime', 'uScroll', 'uReveal', 'uHasTex', 'uFadeL', 'uDim']);
     let hasTex = 0;
     let imgSize = [1, 1];
     loadTexture(gl, src, (size) => {
@@ -251,7 +280,7 @@
       onTexture?.();
     });
 
-    const mouse = { x: -9999, y: -9999 };
+    const mouse = { x: -9999, y: -9999, px: -9999, py: -9999, vel: 0 };
     addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
     const sm = { x: -9999, y: -9999 };
     const state = { revealStart: null };
@@ -265,11 +294,15 @@
       if (sm.x < -999) { sm.x = mouse.x; sm.y = mouse.y; }
       sm.x += (mouse.x - sm.x) * 0.12;
       sm.y += (mouse.y - sm.y) * 0.12;
+      const v = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
+      mouse.vel += (Math.min(v / 60, 1) - mouse.vel) * 0.08;
+      mouse.px = mouse.x; mouse.py = mouse.y;
       const rev = state.revealStart === null ? 0 : Math.min(1, (now - state.revealStart) / 2200);
       gl.uniform2f(u.uRes, canvas.width, canvas.height);
       gl.uniform4f(u.uRect, (pr.left - cr.left) * dpr, (pr.top - cr.top) * dpr, pr.width * dpr, pr.height * dpr);
       gl.uniform2f(u.uImg, imgSize[0], imgSize[1]);
       gl.uniform2f(u.uMouse, (sm.x - cr.left) * dpr, (sm.y - cr.top) * dpr);
+      gl.uniform1f(u.uVel, mouse.vel);
       gl.uniform1f(u.uTime, (now - t0) / 1000);
       gl.uniform1f(u.uScroll, Math.min(1, Math.max(0, -cr.top / cr.height)));
       gl.uniform1f(u.uReveal, 1 - Math.pow(1 - rev, 3));

@@ -23,7 +23,7 @@ Títulos em Roslindale Display (Regular e Italic) e textos em Manrope. A Roslind
 
 ## Vídeos
 Basta colocar os arquivos em `assets/video/` com estes nomes. Eles são carregados automaticamente; se o arquivo não existir, o site mantém o visual animado:
-- `abertura.mp4`: filme de 18 s. Os capítulos do hero sincronizam com o tempo do vídeo
+- `abertura.mp4`: filme de abertura. O hero tem 5 temas (título e texto próprios); sem o vídeo, cada tema fica 7,5 s (`THEME_SECONDS` em `main.js`); com o vídeo, os temas dividem a duração dele
 - `estetica.mp4`, `saude.mp4`, `recovery.mp4`: loops dos pilares
 
 ## Fotos e vídeos
