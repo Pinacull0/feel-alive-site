@@ -632,6 +632,7 @@ function initScrollScenes() {
   const sigLetters = sig ? [...sig.children] : [];
   const skews = $$('[data-skew]');
   const zooms = $$('[data-zoom]');
+  const scenes = $$('[data-scene]');
   // alvos das animações ligadas à rolagem (as variáveis são lidas no CSS)
   const scrubs = reduced ? [] : $$('.section--expand, .img-reveal, .journey, .member, .proto, .rec, .care__visual, .hero, .page-hero, .section:has(> .drift)');
   const marquees = $$('.marquee').map((m) => {
@@ -678,6 +679,18 @@ function initScrollScenes() {
       el.style.setProperty('--p', clamp((vh - r.top) / (vh + r.height)).toFixed(4));
       el.style.setProperty('--e', easeOut(clamp((vh - r.top) / (vh * .75))).toFixed(4));
       el.style.setProperty('--x', clamp(-r.top / r.height).toFixed(4));
+    });
+
+    // cenas fixas: progresso 0→1 enquanto a seção atravessa a tela
+    scenes.forEach((sc) => {
+      const r = sc.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;
+      const p = reduced ? (sc.hasAttribute('data-mask') ? 1 : .3) : clamp(-r.top / (sc.offsetHeight - vh));
+      sc.style.setProperty('--sp', p.toFixed(4));
+      if (!sc.hasAttribute('data-mask')) return;
+      // a palavra cresce devagar e depois acelera até a foto tomar a tela
+      sc.style.setProperty('--ms', (1 + Math.pow(clamp(p / .72), 3) * 38).toFixed(3));
+      sc.style.setProperty('--mo', (1 - clamp((p - .55) / .2)).toFixed(3));
     });
 
     zooms.forEach((z) => {

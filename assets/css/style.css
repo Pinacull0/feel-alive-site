@@ -810,6 +810,28 @@ canvas[data-silk] { position: absolute; inset: 0; width: 100%; height: 100%; bac
   .zoom__r { transform: translateY(calc(var(--zp, 0) * 40vh)); }
 }
 
+/* O arco também recebe foto (Estética, Nutrologia) */
+.zoom__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.35 - var(--e) * .35)); }
+
+/* Cena: túnel de fotos em 3D (--sp: progresso da cena, 0→1) */
+.depth { position: relative; height: 420vh; background: var(--black); color: var(--white); }
+.depth__sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.depth__stage { position: absolute; inset: 0; z-index: 1; perspective: 900px; perspective-origin: 50% 50%; }
+.depth__item { z-index: 1; --zpos: calc(var(--z) + var(--sp, 0) * 4800); position: absolute; left: 50%; top: 50%; width: clamp(150px, 19vw, 300px); aspect-ratio: 3 / 4; margin: 0; border-radius: 16px; overflow: hidden; background: var(--ink); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8); transform: translate(-50%, -50%) translate3d(var(--x), var(--y), calc(var(--zpos) * 1px)); opacity: min(clamp(0, calc((var(--zpos) + 3600) / 1300), 1), clamp(0, calc((780 - var(--zpos)) / 380), 1)); will-change: transform; }
+.depth__item img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
+.depth__caption { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: 22px; text-align: center; padding: var(--gutter); pointer-events: none; opacity: clamp(0, calc((var(--sp, 0) - .08) * 5), 1); transform: scale(calc(.88 + var(--sp, 0) * .2)); }
+.depth__caption .h2 { max-width: 14ch; text-shadow: 0 8px 40px rgba(0, 0, 0, .7); }
+@media (max-width: 900px) { .depth__item { width: 38vw; } }
+
+/* Cena: palavra vazada que cresce até a foto ocupar a tela (--ms escala, --mo opacidade) */
+.mask-scene { position: relative; height: 340vh; background: var(--black); color: var(--white); }
+.mask-scene__sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; isolation: isolate; }
+.mask-scene__sticky > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; scale: calc(1.25 - var(--sp, 0) * .25); }
+.mask-scene__ink { position: absolute; inset: 0; display: grid; place-items: center; background: var(--black); color: var(--white); mix-blend-mode: multiply; opacity: var(--mo, 1); }
+.mask-scene__ink span { font-family: var(--f-display); font-weight: 400; font-size: calc(88vw / var(--len, 5)); line-height: .8; letter-spacing: -.02em; white-space: nowrap; transform: scale(var(--ms, 1)); }
+.mask-scene__caption { position: absolute; inset: 0; z-index: 2; display: grid; align-content: end; gap: 20px; padding: 0 var(--gutter) 10vh; background: linear-gradient(0deg, rgba(10, 10, 10, .85), rgba(10, 10, 10, 0) 55%); opacity: clamp(0, calc((var(--sp, 0) - .72) * 5), 1); }
+.mask-scene__caption .h2 { max-width: 16ch; translate: 0 calc((1 - var(--sp, 0)) * 80px); }
+
 /* Marquee guiado pela velocidade da rolagem */
 .marquee.is-js .marquee__track { animation: none; }
 
@@ -920,6 +942,8 @@ canvas[data-water] { position: absolute; inset: 0; width: 100%; height: 100%; z-
   [data-reveal], .w > span, .c, .img-reveal, .img-reveal > img { opacity: 1 !important; transform: none !important; clip-path: none !important; filter: none !important; }
   .grain, .curtain { display: none; }
   .section--expand { clip-path: none; }
+  .depth, .mask-scene { height: auto; }
+  .depth__sticky, .mask-scene__sticky { position: relative; height: 100vh; }
   .loader { display: none; }
   .marquee__track { animation: none; }
 }
