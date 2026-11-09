@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261121">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261125">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js?v=20261121" defer></script>
-  <script src="assets/js/main.js?v=20261121" defer></script>
+  <script src="assets/js/gl.js?v=20261125" defer></script>
+  <script src="assets/js/main.js?v=20261125" defer></script>
 </head>
 <body data-page="estetica">
 <main id="conteudo">
@@ -33,16 +33,28 @@
     </div>
   </section>
 
-  <!-- CENA: a janela em arco se abre até ocupar a tela -->
-  <section class="zoom" data-zoom aria-label="Beleza em cada fase">
-    <div class="zoom__sticky">
-      <div class="zoom__frame"><img src="assets/img/dra-bony.jpg" alt="" loading="lazy" style="object-position:50% 18%"></div>
-      <div class="zoom__words" aria-hidden="true"><span class="zoom__l">Natural</span><span class="zoom__r">beleza</span></div>
-      <div class="zoom__caption">
-        <span class="eyebrow" style="color:var(--gold)">Dra. Bony Lara</span>
-        <h2 class="h2">Beleza que acompanha <em>cada fase.</em></h2>
+  <!-- CENA: baralho de fotos (o card da frente sai girando e o de trás assume) -->
+  <section class="deck" data-scene data-deck aria-label="Beleza em cada fase">
+    <div class="deck__sticky">
+      <span class="deck__word" aria-hidden="true">beleza</span>
+      <div class="container deck__grid">
+        <div class="deck__copy">
+          <span class="eyebrow" style="color:var(--gold)">Dra. Bony Lara</span>
+          <ol class="deck__list">
+          <li class="deck__item is-active"><span class="deck__n">01</span><h3 class="deck__title">Beleza que acompanha <em>cada fase.</em></h3><p class="deck__text">Tratamentos que respeitam os traços, as expressões e a história de cada pessoa.</p></li>
+          <li class="deck__item"><span class="deck__n">02</span><h3 class="deck__title">Natural <em>Face</em></h3><p class="deck__text">A beleza de continuar sendo você, com planejamento facial individualizado.</p></li>
+          <li class="deck__item"><span class="deck__n">03</span><h3 class="deck__title">Natural <em>Lift</em></h3><p class="deck__text">Firmeza e sustentação com naturalidade, associando tecnologias conforme avaliação.</p></li>
+          <li class="deck__item"><span class="deck__n">04</span><h3 class="deck__title">Começa por uma <em>conversa.</em></h3><p class="deck__text">Avaliação cuidadosa antes de qualquer indicação, com orientação médica em cada etapa.</p></li>
+          </ol>
+          <div class="deck__meter" aria-hidden="true"><b class="deck__count">01</b><span class="deck__bar"><i></i></span><b>04</b></div>
+        </div>
+        <div class="deck__stack">
+        <figure class="deck__card" style="--i:0;z-index:4"><img src="assets/img/dra-bony.jpg" alt="Dra. Bony Lara" loading="lazy" style="object-position:50% 15%"></figure>
+        <figure class="deck__card" style="--i:1;z-index:3"><img src="assets/img/protocolo-natural-face.jpg" alt="Dra. Bony Lara" loading="lazy" style="object-position:50% 20%"></figure>
+        <figure class="deck__card" style="--i:2;z-index:2"><img src="assets/img/protocolo-natural-lift.jpg" alt="Dra. Bony Lara" loading="lazy" style="object-position:50% 20%"></figure>
+        <figure class="deck__card" style="--i:3;z-index:1"><img src="assets/img/dra-bony-video.jpg" alt="Dra. Bony Lara em consulta" loading="lazy" style="object-position:50% 30%"></figure>
+        </div>
       </div>
-      <span class="zoom__hint">Continue rolando</span>
     </div>
   </section>
 

@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261121">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261125">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js?v=20261121" defer></script>
-  <script src="assets/js/main.js?v=20261121" defer></script>
+  <script src="assets/js/gl.js?v=20261125" defer></script>
+  <script src="assets/js/main.js?v=20261125" defer></script>
 </head>
 <body data-page="clubes">
 <main id="conteudo">
@@ -34,14 +34,27 @@
     </div>
   </section>
 
-  <!-- CENA: a palavra vazada cresce até a foto ocupar a tela -->
-  <section class="mask-scene" data-scene data-mask aria-label="Comunidade">
-    <div class="mask-scene__sticky">
-      <img src="assets/img/clubes-grupo.jpg" alt="" loading="lazy" style="object-position:50% 40%">
-      <div class="mask-scene__ink" aria-hidden="true"><span style="--len:2.4">VIP</span></div>
-      <div class="mask-scene__caption">
-        <span class="eyebrow" style="color:var(--gold)">Comunidade</span>
-        <h2 class="h2">Cuidar de si é melhor <em>em boa companhia.</em></h2>
+  <!-- CENA: baralho de fotos (o card da frente sai girando e o de trás assume) -->
+  <section class="deck" data-scene data-deck aria-label="Comunidade">
+    <div class="deck__sticky">
+      <span class="deck__word" aria-hidden="true">vip</span>
+      <div class="container deck__grid">
+        <div class="deck__copy">
+          <span class="eyebrow" style="color:var(--gold)">Comunidade</span>
+          <ol class="deck__list">
+          <li class="deck__item is-active"><span class="deck__n">01</span><h3 class="deck__title">Cuidar de si em <em>boa companhia.</em></h3><p class="deck__text">Um plano de acompanhamento contínuo, com avaliação e orientação profissional.</p></li>
+          <li class="deck__item"><span class="deck__n">02</span><h3 class="deck__title">Um espaço <em>só seu.</em></h3><p class="deck__text">Atendimento reservado, no seu ritmo, dentro da clínica.</p></li>
+          <li class="deck__item"><span class="deck__n">03</span><h3 class="deck__title">Encontros e <em>experiências.</em></h3><p class="deck__text">Momentos exclusivos para quem faz do cuidado uma parte da rotina.</p></li>
+          <li class="deck__item"><span class="deck__n">04</span><h3 class="deck__title">Acompanhamento <em>contínuo.</em></h3><p class="deck__text">Frequência e indicação definidas pela equipe, com critérios claros.</p></li>
+          </ol>
+          <div class="deck__meter" aria-hidden="true"><b class="deck__count">01</b><span class="deck__bar"><i></i></span><b>04</b></div>
+        </div>
+        <div class="deck__stack">
+        <figure class="deck__card" style="--i:0;z-index:4"><img src="assets/img/clubes-grupo.jpg" alt="Encontro dos Clubes VIP" loading="lazy" style="object-position:50% 40%"></figure>
+        <figure class="deck__card" style="--i:1;z-index:3"><img src="assets/img/clubes-vip.jpg" alt="Sala VIP da Feel Alive" loading="lazy" style="object-position:50% 40%"></figure>
+        <figure class="deck__card" style="--i:2;z-index:2"><img src="assets/img/clubes-vip-hero.jpg" alt="Evento dos Clubes VIP" loading="lazy" style="object-position:60% 40%"></figure>
+        <figure class="deck__card" style="--i:3;z-index:1"><img src="assets/img/clinica-espaco.jpg" alt="Sala de atendimento da Feel Alive" loading="lazy" style="object-position:50% 50%"></figure>
+        </div>
       </div>
     </div>
   </section>

@@ -685,12 +685,20 @@ function initScrollScenes() {
     scenes.forEach((sc) => {
       const r = sc.getBoundingClientRect();
       if (r.bottom < 0 || r.top > vh) return;
-      const p = reduced ? (sc.hasAttribute('data-mask') ? 1 : .3) : clamp(-r.top / (sc.offsetHeight - vh));
+      const p = reduced ? .3 : clamp(-r.top / (sc.offsetHeight - vh));
       sc.style.setProperty('--sp', p.toFixed(4));
-      if (!sc.hasAttribute('data-mask')) return;
-      // a palavra cresce devagar e depois acelera até a foto tomar a tela
-      sc.style.setProperty('--ms', (1 + Math.pow(clamp(p / .72), 3) * 38).toFixed(3));
-      sc.style.setProperty('--mo', (1 - clamp((p - .55) / .2)).toFixed(3));
+      if (!sc.hasAttribute('data-deck')) return;
+      // baralho: o card da frente sai e o seguinte assume; um respiro no fim antes de soltar a cena
+      const cards = sc._cards || (sc._cards = $$('.deck__card', sc));
+      const items = sc._items || (sc._items = $$('.deck__item', sc));
+      const k = reduced ? 0 : clamp((p - .06) * 1.2) * (cards.length - 1);
+      sc.style.setProperty('--k', k.toFixed(4));
+      const active = Math.min(items.length - 1, Math.round(k));
+      if (sc._active !== active) {
+        sc._active = active;
+        items.forEach((it, i) => it.classList.toggle('is-active', i === active));
+        $('.deck__count', sc).textContent = String(active + 1).padStart(2, '0');
+      }
     });
 
     zooms.forEach((z) => {
