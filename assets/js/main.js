@@ -794,6 +794,7 @@ function initFilm() {
   if (!film) return;
   const chapters = $$('.film__ch', film);
   const slides = $$('.hero__slide');
+  const caption = $('.film__caption');
   let idx = -1;
   let timer = null;
   let video = null;
@@ -824,6 +825,7 @@ function initFilm() {
     });
     void chapters[i].offsetWidth; // reinicia a animação da barra
     chapters[i].classList.add('is-active');
+    if (caption) caption.innerHTML = `<span>${chapters[i].dataset.caption || ''}</span>`;
     show(i);
     if (!video) {
       clearTimeout(timer);
@@ -844,7 +846,7 @@ function initFilm() {
     });
   });
   slides.forEach((sl, k) => { if (k) sl.inert = true; });
-  if (reduced) { chapters.forEach((c) => c.classList.add('is-done')); show(0); return; }
+  if (reduced) { chapters.forEach((c) => c.classList.add('is-done')); if (caption) caption.textContent = chapters[0].dataset.caption || ''; show(0); return; }
   set(0);
 }
 
@@ -1140,6 +1142,7 @@ function initWaLinks() {
     a.rel = 'noopener';
   });
   $$('[data-map]').forEach((f) => { f.src = `https://www.google.com/maps?q=${encodeURIComponent(CONFIG.mapQuery)}&output=embed`; });
+  $$('[data-directions]').forEach((el) => { el.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(CONFIG.mapQuery)}`; });
   $$('[data-address]').forEach((el) => { el.textContent = CONFIG.address; });
   $$('[data-reference]').forEach((el) => { el.textContent = CONFIG.reference; });
 }

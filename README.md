@@ -12,7 +12,7 @@ Títulos em Roslindale Display (Regular e Italic) e textos em Manrope. A Roslind
 ## Estrutura
 - `index.html`: Home com as 7 seções do plano
 - `clinica.html`, `estetica.html`, `nutrologia.html` (com `#neuromap`), `recovery.html`, `clubes-vip.html`
-- `equipe.html` saiu do menu (a equipe já aparece na Home e na Clínica); o arquivo ficou sem links
+- Toda página interna termina com "Continue explorando", com links para as outras
 - `assets/css/style.css`: identidade (preto `#0a0a0a`, dourado `#e4b531`, branco) e todos os componentes
 - `assets/js/main.js`: header, menu, footer e modal são injetados aqui; todas as animações também ficam aqui
 

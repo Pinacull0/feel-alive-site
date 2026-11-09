@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261113">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261121">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js?v=20261113" defer></script>
-  <script src="assets/js/main.js?v=20261113" defer></script>
+  <script src="assets/js/gl.js?v=20261121" defer></script>
+  <script src="assets/js/main.js?v=20261121" defer></script>
 </head>
 <body data-page="recovery">
 <main id="conteudo">
@@ -47,9 +47,9 @@
     <div class="depth__sticky">
       <div class="depth__stage">
         <figure class="depth__item" style="--x:-28vw;--y:-12vh;--z:-500"><img src="assets/img/recovery-sauna.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:26vw;--y:10vh;--z:-1250"><img src="assets/img/recovery-imersao.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:-22vw;--y:16vh;--z:-2000"><img src="assets/img/recovery-led.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:30vw;--y:-14vh;--z:-2750"><img src="assets/img/recovery-pressoterapia.jpg" alt="" loading="lazy"></figure>
+        <figure class="depth__item" style="--x:26vw;--y:10vh;--z:-1250"><video src="assets/video/recovery-imersao.mp4" poster="assets/img/recovery-imersao.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
+        <figure class="depth__item" style="--x:-22vw;--y:16vh;--z:-2000"><video src="assets/video/recovery-led.mp4" poster="assets/img/recovery-led.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
+        <figure class="depth__item" style="--x:30vw;--y:-14vh;--z:-2750"><video src="assets/video/recovery-pressoterapia.mp4" poster="assets/img/recovery-pressoterapia.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
         <figure class="depth__item" style="--x:-30vw;--y:-4vh;--z:-3500"><img src="assets/img/clinica-espaco.jpg" alt="" loading="lazy"></figure>
         <figure class="depth__item" style="--x:20vw;--y:18vh;--z:-4250"><img src="assets/img/jornada-recovery.jpg" alt="" loading="lazy"></figure>
       </div>
@@ -133,6 +133,38 @@
       <span class="script" style="font-size:clamp(3rem,6vw,5rem)" data-reveal>desacelere</span>
       <h2 class="h2" data-split>Reserve um tempo <em>para você.</em></h2>
       <div data-reveal><button class="btn btn--gold" data-agendar="Recovery" data-magnetic>Agende sua avaliação <span class="btn__arrow">→</span></button></div>
+    </div>
+  </section>
+
+  <!-- Continue explorando: liga esta página às demais -->
+  <section class="section section--dark explore" aria-labelledby="explore-t">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow" data-reveal>Continue explorando</span>
+        <h2 class="h2" id="explore-t" data-split>Outros caminhos da <em>Feel Alive.</em></h2>
+      </div>
+      <div class="explore__grid" data-reveal>
+        <a class="explore__card" href="clubes-vip.html" data-cursor="Ver">
+          <img src="assets/img/clubes-vip.jpg" alt="" loading="lazy">
+          <span class="explore__label">Clubes VIP</span>
+          <span class="explore__sub">Acompanhamento contínuo</span>
+        </a>
+        <a class="explore__card" href="clinica.html" data-cursor="Ver">
+          <img src="assets/img/fundadores.jpg" alt="" loading="lazy">
+          <span class="explore__label">A Clínica</span>
+          <span class="explore__sub">Quem somos e o nosso jeito de cuidar</span>
+        </a>
+        <a class="explore__card" href="estetica.html" data-cursor="Ver">
+          <img src="assets/img/protocolo-natural-face.jpg" alt="" loading="lazy">
+          <span class="explore__label">Estética e Dermatologia</span>
+          <span class="explore__sub">Natural Face, Natural Lift e tratamentos</span>
+        </a>
+        <a class="explore__card" href="nutrologia.html" data-cursor="Ver">
+          <img src="assets/img/dr-guilherme.jpg" alt="" loading="lazy">
+          <span class="explore__label">Saúde e Longevidade</span>
+          <span class="explore__sub">Nutrologia, nutrição e NeuroMap</span>
+        </a>
+      </div>
     </div>
   </section>
 

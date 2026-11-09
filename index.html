@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Mrs+Saint+Delafield&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261113">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261121">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js?v=20261113" defer></script>
-  <script src="assets/js/main.js?v=20261113" defer></script>
+  <script src="assets/js/gl.js?v=20261121" defer></script>
+  <script src="assets/js/main.js?v=20261121" defer></script>
   <!-- Dados estruturados: validar telefone e horários antes de publicar -->
   <script type="application/ld+json">
   {
@@ -89,12 +89,13 @@
         </div>
       </div>
       <div class="film" role="group" aria-label="Temas do filme de abertura" data-reveal style="--d:900ms">
-        <button class="film__ch"><span class="film__bar"><i></i></span><span><span class="film__t">01</span> <span class="film__label">A vida acontecendo</span></span></button>
-        <button class="film__ch"><span class="film__bar"><i></i></span><span><span class="film__t">02</span> <span class="film__label">O cuidado</span></span></button>
-        <button class="film__ch"><span class="film__bar"><i></i></span><span><span class="film__t">03</span> <span class="film__label">A saúde</span></span></button>
-        <button class="film__ch"><span class="film__bar"><i></i></span><span><span class="film__t">04</span> <span class="film__label">A recuperação</span></span></button>
-        <button class="film__ch"><span class="film__bar"><i></i></span><span><span class="film__t">05</span> <span class="film__label">A essência</span></span></button>
+        <button class="film__ch" data-caption="Um gesto simples diante do espelho."><span class="film__bar"><i></i></span><span><span class="film__t">01</span> <span class="film__label">A vida acontecendo</span></span></button>
+        <button class="film__ch" data-caption="Uma conversa que começa pela escuta."><span class="film__bar"><i></i></span><span><span class="film__t">02</span> <span class="film__label">O cuidado</span></span></button>
+        <button class="film__ch" data-caption="Energia e disposição acompanhadas de perto."><span class="film__bar"><i></i></span><span><span class="film__t">03</span> <span class="film__label">A saúde</span></span></button>
+        <button class="film__ch" data-caption="Água, vapor e luz: o corpo também desacelera."><span class="film__bar"><i></i></span><span><span class="film__t">04</span> <span class="film__label">A recuperação</span></span></button>
+        <button class="film__ch" data-caption="Feel Alive. Sentir-se vivo."><span class="film__bar"><i></i></span><span><span class="film__t">05</span> <span class="film__label">A essência</span></span></button>
       </div>
+      <p class="film__caption" aria-live="polite"></p>
     </div>
     <span class="scroll-hint">Role</span>
   </section>
@@ -222,8 +223,8 @@
         <span class="carousel__progress" aria-hidden="true" data-reveal><i></i></span>
       </div>
       <div class="carousel__stage">
-        <button class="carousel__btn carousel__btn--prev" data-prev aria-label="Protocolo anterior">←</button>
-        <button class="carousel__btn carousel__btn--next" data-next aria-label="Ver mais protocolos">→</button>
+        <button class="carousel__btn carousel__btn--prev" data-prev aria-label="Protocolo anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <button class="carousel__btn carousel__btn--next" data-next aria-label="Ver mais protocolos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       <div class="carousel__track">
         <a class="proto" href="estetica.html#natural-face" data-cursor="Ver">
           <div class="proto__bg"><img src="assets/img/protocolo-natural-face.jpg" alt="" loading="lazy"></div>
@@ -285,10 +286,10 @@
       <div class="depth__stage">
         <figure class="depth__item" style="--x:-28vw;--y:-12vh;--z:-500"><img src="assets/img/clinica-espaco.jpg" alt="" loading="lazy"></figure>
         <figure class="depth__item" style="--x:26vw;--y:10vh;--z:-1250"><img src="assets/img/recovery-sauna.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:-22vw;--y:16vh;--z:-2000"><img src="assets/img/clubes-vip.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:30vw;--y:-14vh;--z:-2750"><img src="assets/img/recovery-imersao.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:-30vw;--y:-4vh;--z:-3500"><img src="assets/img/fundadores.jpg" alt="" loading="lazy"></figure>
-        <figure class="depth__item" style="--x:20vw;--y:18vh;--z:-4250"><img src="assets/img/recovery-led.jpg" alt="" loading="lazy"></figure>
+        <figure class="depth__item" style="--x:-22vw;--y:16vh;--z:-2000"><video src="assets/video/recovery-pressoterapia.mp4" poster="assets/img/recovery-pressoterapia.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
+        <figure class="depth__item" style="--x:30vw;--y:-14vh;--z:-2750"><video src="assets/video/recovery-imersao.mp4" poster="assets/img/recovery-imersao.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
+        <figure class="depth__item" style="--x:-30vw;--y:-4vh;--z:-3500"><video src="assets/video/dra-bony.mp4" poster="assets/img/dra-bony-video.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
+        <figure class="depth__item" style="--x:20vw;--y:18vh;--z:-4250"><video src="assets/video/recovery-led.mp4" poster="assets/img/recovery-led.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video></figure>
       </div>
       <div class="depth__caption">
         <span class="eyebrow" style="color:var(--gold)">Por dentro da Feel Alive</span>
@@ -362,6 +363,13 @@
         <div class="hero__actions" data-reveal>
           <a class="btn btn--gold" data-wa="Olá! Vim pelo site e gostaria de mais informações sobre a Feel Alive." data-magnetic>Mais informações no WhatsApp <span class="btn__arrow">→</span></a>
         </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="visit__route img-reveal">
+        <iframe data-map title="Mapa: localização da Feel Alive no Edifício Domo Business" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <span class="visit__pin"></span>
+        <a class="visit__directions" data-directions target="_blank" rel="noopener">Traçar rota <span class="btn__arrow">→</span></a>
       </div>
     </div>
   </section>
