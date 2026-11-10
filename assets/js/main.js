@@ -725,6 +725,73 @@ function initScrollScenes() {
 }
 
 /* ==========================================================================
+   Fotos que se alternam com fade (faixa Clubes VIP da Home)
+   ========================================================================== */
+const SLIDE_SECONDS = 6;
+function initSlides() {
+  $$('[data-slides]').forEach((box) => {
+    const imgs = $$('img', box);
+    if (imgs.length < 2 || reduced) return;
+    let i = 0;
+    let timer = null;
+    const ready = (img) => img.complete && img.naturalWidth > 0;
+    const next = () => {
+      const n = (i + 1) % imgs.length;
+      if (!ready(imgs[n])) return; // espera a foto carregar para não piscar preto
+      imgs[i].classList.remove('is-active');
+      imgs[n].classList.add('is-active');
+      i = n;
+    };
+    const start = () => { if (!timer) timer = setInterval(next, SLIDE_SECONDS * 1000); };
+    const stop = () => { clearInterval(timer); timer = null; };
+    // só roda enquanto a faixa está na tela; ao entrar, já carrega as próximas fotos
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { imgs.forEach((im) => { im.loading = 'eager'; }); start(); } else stop();
+    }, { threshold: .15 }).observe(box.closest('section') || box);
+  });
+}
+
+/* ==========================================================================
+   Venha conhecer: fotos do espaço com transição em WebGL (ou CSS, sem WebGL)
+   ========================================================================== */
+const SPACE_SECONDS = 6.5;
+function initVisitSlides() {
+  $$('[data-visit-slides]').forEach((box) => {
+    const imgs = $$('img', box);
+    const bars = $$('.visit-slides__bars i', box);
+    const count = $('.visit-slides__count', box);
+    const label = $('.visit-slides__label', box);
+    let i = 0;
+    let timer = null;
+    let gl = null;
+    if (window.FAGL && !reduced) {
+      try { gl = FAGL.slides($('canvas', box), { srcs: imgs.map((im) => im.getAttribute('src')), onReady: () => box.classList.add('is-gl') }); } catch { gl = null; }
+    }
+    const mark = (n) => {
+      bars.forEach((b, k) => { b.classList.toggle('is-done', k < n); b.classList.remove('is-active'); b.style.setProperty('--dur', `${SPACE_SECONDS}s`); });
+      void bars[n].offsetWidth; // reinicia a barra
+      bars[n].classList.add('is-active');
+      count.textContent = String(n + 1).padStart(2, '0');
+      label.innerHTML = `<span>${imgs[n].dataset.label || ''}</span>`;
+    };
+    const show = (n) => {
+      if (box.classList.contains('is-gl') && gl && !gl.go(n)) return; // textura ainda carregando
+      if (!box.classList.contains('is-gl') && !(imgs[n].complete && imgs[n].naturalWidth)) return;
+      imgs.forEach((im, k) => { im.classList.toggle('is-prev', k === i); im.classList.toggle('is-active', k === n); });
+      i = n;
+      mark(n);
+    };
+    mark(0);
+    if (reduced) return;
+    const start = () => { if (!timer) timer = setInterval(() => show((i + 1) % imgs.length), SPACE_SECONDS * 1000); };
+    const stop = () => { clearInterval(timer); timer = null; };
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { imgs.forEach((im) => { im.loading = 'eager'; }); start(); } else stop();
+    }, { threshold: .2 }).observe(box.closest('section') || box);
+  });
+}
+
+/* ==========================================================================
    Carrossel com setas (protocolos)
    ========================================================================== */
 function initCarousel() {
@@ -774,9 +841,14 @@ function initVideos() {
     if (reduced && !controls) return;
     const v = document.createElement('video');
     if (controls) {
-      Object.assign(v, { controls: true, playsInline: true, preload: 'metadata' });
+      // toca sozinho e sem som enquanto está na tela; os controles ligam o som
+      Object.assign(v, { controls: true, playsInline: true, muted: true, loop: true, preload: 'metadata' });
+      v.setAttribute('muted', '');
       const poster = $('img', box);
       if (poster) v.poster = poster.src;
+      if (!reduced) {
+        new IntersectionObserver(([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }, { threshold: .35 }).observe(box);
+      }
     } else {
       Object.assign(v, { muted: true, loop: !box.hasAttribute('data-video-once'), playsInline: true, autoplay: true, preload: 'metadata' });
       v.setAttribute('muted', '');
@@ -1197,6 +1269,8 @@ initCursor();
 initVideos();
 initScrollScenes();
 initCarousel();
+initSlides();
+initVisitSlides();
 initBeforeAfter();
 initTreatmentList();
 initTeam();

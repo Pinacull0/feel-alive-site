@@ -478,5 +478,105 @@
     canvas.classList.add('is-gl');
   }
 
-  window.FAGL = { particles, hero, silk, water };
+  /* ------------------------------------------------------------------------
+     Fotos do espaço: a próxima invade a atual por uma frente irregular com
+     borda dourada; perto da frente a imagem ondula; cada foto tem zoom lento
+     ------------------------------------------------------------------------ */
+  const SLIDES_FS = `
+    precision highp float;
+    uniform sampler2D uA, uB;
+    uniform vec2 uRes, uSizeA, uSizeB;
+    uniform float uP, uTime, uZoomA, uZoomB;
+    ${NOISE}
+    vec3 photo(sampler2D t, vec2 size, vec2 uv, float zoom){
+      float rA = uRes.x / uRes.y, iA = size.x / size.y;
+      vec2 s = rA > iA ? vec2(1.0, iA / rA) : vec2(rA / iA, 1.0);
+      return texture2D(t, clamp((uv - 0.5) * s / zoom + 0.5, 0.001, 0.999)).rgb;
+    }
+    void main(){
+      vec2 uv = gl_FragCoord.xy / uRes;
+      uv.y = 1.0 - uv.y;
+      vec2 q = uv * vec2(uRes.x / uRes.y, 1.0);
+      float n = fbm(q * 2.5 + vec2(uTime * 0.04, 0.0));
+      float d = uv.x * 0.45 + (1.0 - uv.y) * 0.55 + (n - 0.5) * 0.35;
+      float edge = uP * 1.5 - 0.25 - d;
+      float m = smoothstep(0.0, 0.06, edge);
+      float rim = smoothstep(-0.04, 0.0, edge) * (1.0 - smoothstep(0.0, 0.08, edge));
+      float near = exp(-pow(edge * 9.0, 2.0)) * step(0.001, uP);
+      vec2 disp = vec2(fbm(q * 4.0 + 3.1), fbm(q * 4.0 - 1.7)) - 0.5;
+      vec3 a = photo(uA, uSizeA, uv + disp * (0.12 * near + 0.04 * uP), uZoomA);
+      vec3 b = photo(uB, uSizeB, uv - disp * (0.12 * near + 0.04 * (1.0 - uP)), uZoomB);
+      vec3 col = mix(a, b, m);
+      col += vec3(0.894, 0.71, 0.192) * rim * 1.1;
+      vec2 v = uv - 0.5;
+      col *= 1.0 - dot(v, v) * 0.35;
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+
+  function slides(canvas, { srcs, onReady }) {
+    const gl = ctx(canvas, { alpha: false });
+    if (!gl) return null;
+    const p = program(gl, QUAD_VS, SLIDES_FS);
+    fullQuad(gl, p);
+    const u = uniforms(gl, p, ['uA', 'uB', 'uRes', 'uSizeA', 'uSizeB', 'uP', 'uTime', 'uZoomA', 'uZoomB']);
+    const tex = srcs.map(() => null);
+    const sizes = srcs.map(() => [1, 1]);
+    srcs.forEach((src, i) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const t = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, t);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+          tex[i] = t;
+          sizes[i] = [img.naturalWidth, img.naturalHeight];
+          if (i === 0) onReady?.();
+        } catch { /* file:// bloqueia texturas: fica a versão em CSS */ }
+      };
+      img.src = src;
+    });
+    const t0 = performance.now();
+    const born = srcs.map(() => t0);
+    const st = { cur: 0, next: 0, at: 0 };
+    const zoom = (i, now) => 1.1 - 0.1 * Math.min(1, (now - born[i]) / 7000);
+    const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    loopWhenVisible(canvas, (now) => {
+      if (!tex[st.cur]) return;
+      fit(canvas, 2);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      let pr = 0;
+      if (st.next !== st.cur) {
+        const raw = Math.min(1, (now - st.at) / 1700);
+        pr = ease(raw);
+        if (raw >= 1) { st.cur = st.next; pr = 0; }
+      }
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex[st.cur]); gl.uniform1i(u.uA, 0);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tex[st.next]); gl.uniform1i(u.uB, 1);
+      gl.uniform2f(u.uRes, canvas.width, canvas.height);
+      gl.uniform2f(u.uSizeA, sizes[st.cur][0], sizes[st.cur][1]);
+      gl.uniform2f(u.uSizeB, sizes[st.next][0], sizes[st.next][1]);
+      gl.uniform1f(u.uP, pr);
+      gl.uniform1f(u.uTime, (now - t0) / 1000);
+      gl.uniform1f(u.uZoomA, zoom(st.cur, now));
+      gl.uniform1f(u.uZoomB, zoom(st.next, now));
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    });
+    return {
+      // troca para a foto n; devolve false se a textura ainda não carregou
+      go(n) {
+        if (!tex[n] || n === st.next) return false;
+        if (st.next !== st.cur) st.cur = st.next;
+        st.next = n;
+        st.at = performance.now();
+        born[n] = st.at;
+        return true;
+      },
+    };
+  }
+
+  window.FAGL = { particles, hero, silk, water, slides };
 })();
