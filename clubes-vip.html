@@ -10,22 +10,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Manrope:wght@300;400;500;600;700&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20261136">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261163">
   <script>try{var d=document.documentElement,s=sessionStorage;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){if(!s.getItem('fa-visited'))d.classList.add('is-first');else if(s.getItem('fa-curtain'))d.classList.add('is-curtain')}}catch(e){}</script>
-  <script src="assets/js/gl.js?v=20261136" defer></script>
-  <script src="assets/js/main.js?v=20261136" defer></script>
+  <script src="assets/js/gl.js?v=20261163" defer></script>
+  <script src="assets/js/main.js?v=20261163" defer></script>
 </head>
 <body data-page="clubes">
 <main id="conteudo">
 
   <section class="page-hero page-hero--full vip-band">
-    <div class="page-hero__bg"><canvas data-silk=".7"></canvas><div class="page-hero__photo"><img src="assets/img/clubes-vip-hero.jpg" alt=""></div></div>
+    <div class="page-hero__bg"><canvas data-silk=".7"></canvas><div class="page-hero__photo vip-video"><video src="assets/video/videovips.mp4" poster="assets/img/clubes-vip-hero.jpg" loop playsinline preload="auto" aria-hidden="true"></video></div></div>
     <div class="vip-band__ring"></div><div class="vip-band__ring"></div>
     <div class="container">
       <span class="eyebrow" data-reveal>Clubes VIP</span>
       <h1 class="h1" data-split="chars">Cuidar de si como parte <em>da rotina.</em></h1>
       <p class="lead" data-reveal style="--d:400ms">Um plano de acompanhamento e acesso a benefícios definidos conforme a modalidade, com avaliação e orientação profissional.</p>
     </div>
+    <button class="sound-btn vip-sound is-on" data-vip-sound aria-pressed="true" type="button"><span class="sound-btn__eq" aria-hidden="true"><i></i><i></i><i></i></span><span class="sound-btn__txt">Som ligado</span></button>
   </section>
 
   <section class="section section--dark" aria-label="Promessa">
@@ -48,6 +49,7 @@
           <li class="deck__item"><span class="deck__n">04</span><h3 class="deck__title">Acompanhamento <em>contínuo.</em></h3><p class="deck__text">Frequência e indicação definidas pela equipe, com critérios claros.</p></li>
           </ol>
           <div class="deck__meter" aria-hidden="true"><b class="deck__count">01</b><span class="deck__bar"><i></i></span><b>04</b></div>
+          <div class="deck__cta"><button class="btn btn--gold" data-agendar="Clubes VIP" data-magnetic tabindex="-1">Agendar consulta <span class="btn__arrow">→</span></button></div>
         </div>
         <div class="deck__stack">
         <figure class="deck__card" style="--i:0;z-index:4"><img src="assets/img/clubes-grupo.jpg" alt="Encontro dos Clubes VIP" loading="lazy" style="object-position:50% 40%"></figure>
