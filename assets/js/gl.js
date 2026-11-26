@@ -203,17 +203,18 @@
       float t = uTime * 0.05;
       vec2 q = vec2(fbm(p * 1.6 + t), fbm(p * 1.6 + vec2(5.2, 1.3) - t));
       float n = fbm(p * 1.8 + 2.2 * q + vec2(t * 0.7, -t));
-      vec3 col = vec3(0.035) + vec3(0.13, 0.1, 0.035) * smoothstep(0.3, 0.95, n);
-      col += GOLD * pow(smoothstep(0.5, 1.0, n), 3.0) * 0.34;
+      // fundo claro (cores invertidas) com veios dourados
+      vec3 col = vec3(0.98, 0.95, 0.86) - vec3(0.04, 0.09, 0.3) * smoothstep(0.3, 0.95, n);
+      col = mix(col, GOLD, pow(smoothstep(0.35, 1.0, n), 1.6) * 0.7);
       float streak = 0.5 + 0.5 * sin((p.x * 2.0 + q.y * 3.0 + n * 4.0) * 6.0 + uTime * 0.3);
-      return col + GOLD * pow(streak, 14.0) * 0.1 * smoothstep(0.4, 0.9, n);
+      return mix(col, GOLD, pow(streak, 8.0) * 0.4 * smoothstep(0.4, 0.9, n));
     }
     // enquadra a foto no retângulo da área da foto (cobre, ancorada no topo, onde ficam os rostos)
     vec2 coverUV(vec2 local, vec2 size, float zoom){
       float rA = uRect.z / uRect.w, iA = size.x / size.y;
       vec2 uv = local;
       if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr; }
-      else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.5; }
+      else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.62; }
       return clamp((uv - vec2(0.5, 0.0)) * zoom + vec2(0.5, 0.0), 0.0, 1.0);
     }
     vec3 photo(vec2 frag, vec3 col){
@@ -264,7 +265,7 @@
       float edge = uReveal * 1.35 - (1.0 - sc.y) - fbm(sc * vec2(uRes.x / uRes.y, 1.0) * 4.0 + 3.0) * 0.35;
       float rv = smoothstep(0.0, 0.08, edge);
       float rim = smoothstep(0.0, 0.03, edge) - smoothstep(0.03, 0.12, edge);
-      col = mix(vec3(0.02), col, rv);
+      col = mix(vec3(0.965), col, rv);
       col += GOLD * rim * 0.9 * step(uReveal, 0.999);
       // faixa de brilho que atravessa a tela inteira
       float band = smoothstep(0.05, 0.0, abs(sc.x * 0.8 + sc.y * 0.6 - fract(uTime * 0.07) * 2.6 + 0.3));
@@ -272,7 +273,7 @@
 
 
       vec2 vv = frag / uRes - 0.5;
-      col *= 1.0 - dot(vv, vv) * 0.7;
+      col = mix(col, vec3(1.0), dot(vv, vv) * 0.7);
       col += (hash(frag + fract(uTime) * 100.0) - 0.5) * 0.04;
       gl_FragColor = vec4(col, 1.0);
     }`;
@@ -393,13 +394,13 @@
       }
       float f = 0.5 + 0.5 * sin(p.x + p.y);
       float g = 0.5 + 0.5 * cos(p.x * 0.6 - p.y * 1.2 + t);
-      vec3 col = mix(vec3(0.035, 0.03, 0.022), vec3(0.42, 0.3, 0.06), smoothstep(0.15, 0.85, f));
+      vec3 col = mix(vec3(0.97, 0.91, 0.74), vec3(0.94, 0.76, 0.3), smoothstep(0.15, 0.85, f));
       col = mix(col, vec3(0.894, 0.71, 0.192), smoothstep(0.55, 0.95, f * g + 0.15));
       col += vec3(1.0, 0.93, 0.7) * pow(smoothstep(0.62, 1.0, f * g + 0.05), 5.0) * 0.55;
-      col *= 0.55 + 0.45 * g;
+      col = mix(vec3(1.0), col, 0.55 + 0.45 * g);
       vec2 v = gl_FragCoord.xy / uRes - 0.5;
-      col *= 1.0 - dot(v, v) * 1.1;
-      col *= uDim;
+      col = mix(col, vec3(1.0), dot(v, v) * 1.1);
+      col = mix(vec3(0.965), col, uDim);
       col += (hash(gl_FragCoord.xy + fract(uTime) * 91.0) - 0.5) * 0.03;
       gl_FragColor = vec4(col, 1.0);
     }`;
@@ -480,15 +481,15 @@
         col = texture2D(uTex, uv).rgb;
       } else {
         vec2 q = p + off;
-        col = mix(vec3(0.02, 0.045, 0.05), vec3(0.04, 0.1, 0.11), fbm(q * 1.8 + uTime * 0.03));
-        col += vec3(0.894, 0.75, 0.4) * caustic(q * 0.9, uTime * 0.35 + 23.0) * 0.32;
+        col = mix(vec3(0.94, 0.96, 0.965), vec3(0.84, 0.9, 0.92), fbm(q * 1.8 + uTime * 0.03));
+        col = mix(col, vec3(0.894, 0.75, 0.4), caustic(q * 0.9, uTime * 0.35 + 23.0) * 0.32);
       }
       vec3 L = normalize(vec3(-0.45, -0.55, 1.0));
       float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 70.0);
       col += vec3(1.0, 0.9, 0.62) * spec * 0.7;
       col += vec3(0.894, 0.71, 0.192) * clamp(length(g) * 0.8, 0.0, 1.0) * 0.12;
       vec2 v = frag / uRes - 0.5;
-      col *= 1.0 - dot(v, v) * 0.6;
+      col = mix(col, vec3(1.0), dot(v, v) * 0.6);
       col += (hash(frag + fract(uTime) * 77.0) - 0.5) * 0.03;
       gl_FragColor = vec4(col, 1.0);
     }`;
@@ -569,7 +570,7 @@
       vec3 col = mix(a, b, m);
       col += vec3(0.894, 0.71, 0.192) * rim * 1.1;
       vec2 v = uv - 0.5;
-      col *= 1.0 - dot(v, v) * 0.35;
+      col = mix(col, vec3(1.0), dot(v, v) * 0.35);
       gl_FragColor = vec4(col, 1.0);
     }`;
 

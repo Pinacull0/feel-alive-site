@@ -673,7 +673,7 @@ function initScrollScenes() {
       // túnel de fotos: item que passou da câmera some de vez (nada fica preso na tela com o texto)
       if (sc.classList.contains('depth')) {
         const its = sc._depth || (sc._depth = $$('.depth__item', sc).map((el) => ({ el, z: parseFloat(el.style.getPropertyValue('--z')) || 0 })));
-        its.forEach(({ el, z }) => { el.style.visibility = z + p * 5600 > 460 ? 'hidden' : ''; });
+        its.forEach(({ el, z }) => { el.style.visibility = z + p * (parseFloat(getComputedStyle(sc).getPropertyValue('--zmul')) || 5600) > 460 ? 'hidden' : ''; });
       }
       if (!sc.hasAttribute('data-deck')) return;
       // baralho: o card da frente sai e o seguinte assume; um respiro no fim antes de soltar a cena
@@ -1086,7 +1086,7 @@ function initNeuro() {
     ctx.shadowColor = 'rgba(228,181,49,.8)'; ctx.shadowBlur = 10;
     wave('#e4b531', h * .26, .018, .0016, 0, 1.6);
     ctx.shadowBlur = 0;
-    wave('rgba(255,255,255,.35)', h * .18, .024, .0011, 2, 1);
+    wave('rgba(0,0,0,.35)', h * .18, .024, .0011, 2, 1);
     if (visible && !reduced) requestAnimationFrame(draw);
   };
 }
@@ -1253,6 +1253,147 @@ function initWaLinks() {
 /* ==========================================================================
    Boot
    ========================================================================== */
+/* Parallax avançado: camadas em velocidades diferentes, cards que "deitam" ao entrar
+   e molduras que giram levemente em 3D conforme a rolagem */
+function initDeepParallax() {
+  if (reduced) return;
+  const items = [];
+  const add = (sel, kind, k) => $$(sel).forEach((el) => {
+    if (el.hasAttribute('data-parallax') || el.closest('.hero, .deck, .depth, .zoom')) return;
+    if (items.some((it) => it.el === el)) return;
+    el.setAttribute(kind === 'tilt' ? 'data-tilt3d' : kind === 'swing' ? 'data-swing' : 'data-depth', '');
+    items.push({ el, kind, k });
+  });
+  // fotos dentro das molduras: correm em sentido contrário à rolagem
+  add('.journey__media > img, .member__img img, .proto__bg img, .rec__photo, .portrait img, .explore__card img, .img-reveal > img', 'img', -0.14);
+  // títulos de seção flutuam mais devagar que o resto da página
+  add('.section-head, .cta-band', 'text', 0.09);
+  // cards entram inclinados para trás e assentam quando chegam ao centro
+  add('.explore__card, .ba-case, .rec, .note, .protocol', 'tilt', 16);
+  // molduras grandes giram levemente no eixo Y
+  add('.portrait, .care__visual, .visit__map', 'swing', 7);
+  if (!items.length) return;
+  let ticking = false;
+  const run = () => {
+    ticking = false;
+    const vh = innerHeight;
+    items.forEach(({ el, kind, k }) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -150 || r.top > vh + 150) return;
+      const c = (r.top + r.height / 2 - vh / 2) / vh; // negativo acima do centro, positivo abaixo
+      if (kind === 'tilt') el.style.setProperty('--tilt', `${(clamp(c * 1.6, 0, 1) * k).toFixed(2)}deg`);
+      else if (kind === 'swing') el.style.setProperty('--ry', `${(clamp(c, -1, 1) * -k).toFixed(2)}deg`);
+      else el.style.setProperty('--py', `${clamp(c * k * vh, -90, 90).toFixed(1)}px`);
+    });
+  };
+  const req = () => { if (!ticking) { ticking = true; requestAnimationFrame(run); } };
+  addEventListener('scroll', req, { passive: true });
+  addEventListener('resize', req);
+  run();
+}
+
+/* Cards conectados: cada card surge com a rolagem, a linha dourada cresce até o próximo
+   e a borda fica dourada quando a conexão chega (mesma lógica no desktop e no celular) */
+function initCardsFlow() {
+  const groups = $$('.cards').map((box) => {
+    const cards = $$('.card', box);
+    box.classList.add('cards-flow');
+    box.style.setProperty('--n', cards.length);
+    // a seção fica fixa na tela enquanto os cards aparecem e se conectam
+    const section = box.closest('section');
+    if (section && !reduced) { section.classList.add('cards-pin'); section.style.setProperty('--n', cards.length); }
+    return { box, cards, section, stage: box.parentElement, overflow: 0 };
+  });
+  if (!groups.length) return;
+  const paint = ({ cards }, P) => {
+    const n = cards.length, seg = 1 / n;
+    const line = (k) => (k < 0 || k >= n - 1 ? 0 : clamp((P - k * seg - seg * .45) / (seg * .55)));
+    cards.forEach((c, k) => {
+      c.style.setProperty('--a', clamp((P - k * seg) / (seg * .6)).toFixed(3));
+      c.style.setProperty('--l', line(k).toFixed(3));
+      c.style.setProperty('--b', (k === 0 ? line(0) || (n === 1 ? clamp(P / seg) : 0) : line(k - 1)).toFixed(3));
+    });
+  };
+  if (reduced) { groups.forEach((g) => paint(g, 1)); return; }
+  // quanto os cards passam da altura da tela fixa (no celular, empilhados): a pilha sobe com a rolagem
+  const measure = () => groups.forEach((g) => {
+    g.stage.style.setProperty('--ty', '0px');
+    const stage = g.stage.getBoundingClientRect();
+    const box = g.box.getBoundingClientRect();
+    g.overflow = Math.max(0, box.bottom - (stage.top + innerHeight - 28));
+  });
+  let ticking = false;
+  const run = () => {
+    ticking = false;
+    const vh = innerHeight;
+    groups.forEach((g) => {
+      const r = g.section.getBoundingClientRect();
+      const span = g.section.offsetHeight - vh;
+      // 0 quando a seção encosta no topo da tela, 1 quando ela vai soltar
+      const P = span > 0 ? clamp(-r.top / span) : 1;
+      paint(g, clamp(P / .9));
+      if (g.overflow) g.stage.style.setProperty('--ty', `${(-g.overflow * clamp((P - .05) / .85)).toFixed(1)}px`);
+    });
+  };
+  const req = () => { if (!ticking) { ticking = true; requestAnimationFrame(run); } };
+  addEventListener('scroll', req, { passive: true });
+  addEventListener('resize', () => { measure(); req(); });
+  addEventListener('load', () => { measure(); req(); });
+  document.fonts?.ready.then(() => { measure(); req(); });
+  measure();
+  run();
+}
+
+/* Cena dos fundadores: progresso 0 a 1 enquanto a seção fixa atravessa a tela */
+function initSplitScene() {
+  const scenes = $$('[data-split-scene]');
+  if (!scenes.length || reduced) return;
+  let ticking = false;
+  const run = () => {
+    ticking = false;
+    const vh = innerHeight;
+    scenes.forEach((sc) => {
+      const r = sc.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 2) return;
+      const span = sc.offsetHeight - vh;
+      sc.style.setProperty('--s', span > 0 ? clamp(-r.top / span).toFixed(4) : '1');
+    });
+  };
+  const req = () => { if (!ticking) { ticking = true; requestAnimationFrame(run); } };
+  addEventListener('scroll', req, { passive: true });
+  addEventListener('resize', req);
+  run();
+}
+
+/* NeuroMap 3D: pontos em órbita, brilho das barras em sequência e inclinação seguindo o mouse */
+function initNeuro3D() {
+  const dash = $('.dash');
+  if (!dash || reduced) return;
+  const orbit = document.createElement('div');
+  orbit.className = 'dash__orbit';
+  orbit.setAttribute('aria-hidden', 'true');
+  orbit.innerHTML = [0, 1, 2, 3, 4, 5].map((i) => `<i style="--i:${i};--y:${[-120, 60, -30, 140, -150, 20][i]}px"></i>`).join('');
+  dash.append(orbit);
+  $$('.bars i', dash).forEach((b, k) => b.style.setProperty('--k', k));
+  if (!finePointer) return;
+  const stage = dash.closest('.neuro__sticky') || dash;
+  let mx = 0, my = 0, tx = 0, ty = 0, raf = null;
+  const loop = () => {
+    mx = lerp(mx, tx, .08); my = lerp(my, ty, .08);
+    dash.style.setProperty('--mx', mx.toFixed(3));
+    dash.style.setProperty('--my', my.toFixed(3));
+    raf = Math.abs(mx - tx) + Math.abs(my - ty) > .002 ? requestAnimationFrame(loop) : null;
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+  stage.addEventListener('pointermove', (e) => {
+    const r = stage.getBoundingClientRect();
+    tx = clamp((e.clientX - r.left) / r.width, 0, 1) * 2 - 1;
+    ty = clamp((e.clientY - r.top) / r.height, 0, 1) * 2 - 1;
+    kick();
+  });
+  stage.addEventListener('pointerleave', () => { tx = 0; ty = 0; kick(); });
+}
+
 function initHeroGL() {
   const hero = $('.hero');
   const canvas = $('.hero__gl');
@@ -1294,6 +1435,10 @@ initScrollScenes();
 initCarousel();
 initSlides();
 initVipVideo();
+initDeepParallax();
+initCardsFlow();
+initSplitScene();
+initNeuro3D();
 initVisitSlides();
 initBeforeAfter();
 initTreatmentList();
