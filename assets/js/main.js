@@ -4,7 +4,7 @@
 
 /* Dados institucionais — VALIDAR com a clínica antes da publicação (plano, seção 21) */
 const CONFIG = {
-  whatsapp: '5511900000000', // TODO: número oficial de WhatsApp da recepção
+  whatsapp: '5511991267959', // (11) 99126-7959
   addressShort: 'Domo Business · São Bernardo do Campo',
   address: 'Edifício Domo Business, Torre B · R. José Versolato, 111, sala 821 · Centro, São Bernardo do Campo/SP · 09750-730',
   reference: 'Ao lado do Shopping Metrópole · Estacionamento no local',
@@ -43,7 +43,7 @@ const waLink = (msg) => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURICompon
 const waIcon = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>';
 
 /* ==========================================================================
-   Estrutura compartilhada (header, menu, footer, modal…)
+   Estrutura compartilhada (header, menu, footer…)
    ========================================================================== */
 function renderShell() {
   const links = NAV.map(([href, label, id]) =>
@@ -120,24 +120,7 @@ function renderShell() {
     </footer>
     <a class="wa-float" href="${waLink(`Olá! Vim pela página ${pageName} do site e gostaria de mais informações.`)}" target="_blank" rel="noopener" aria-label="Conversar pelo WhatsApp">${waIcon}</a>
     <div class="preview" aria-hidden="true"><div class="preview__orb"></div><div class="preview__text"></div></div>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal__bg" data-close></div>
-      <div class="modal__card">
-        <button class="modal__close" data-close aria-label="Fechar">×</button>
-        <span class="eyebrow">Agendamento</span>
-        <h2 class="h3" id="modal-title" style="margin-top:14px">Agende sua avaliação</h2>
-        <p class="small" style="margin-top:8px">Conte por onde quer começar. A equipe confirma horários e profissionais pelo WhatsApp.</p>
-        <form class="form" novalidate>
-          <div class="field"><label>Por onde quer começar?</label>
-            <div class="chips">${SPECIALTIES.map((s, i) => `<label class="chip"><input type="radio" name="esp" value="${s}"${i === 0 ? ' checked' : ''}><span>${s}</span></label>`).join('')}</div>
-          </div>
-          <div class="field"><label for="f-nome">Seu nome</label><input id="f-nome" name="nome" required autocomplete="name" placeholder="Como podemos te chamar?"></div>
-          <div class="field"><label for="f-msg">Mensagem (opcional)</label><textarea id="f-msg" name="msg" rows="3" placeholder="Algo que gostaria de contar antes da conversa?"></textarea></div>
-          <label class="consent"><input type="checkbox" name="lgpd" required> Autorizo o contato da Feel Alive para fins de agendamento, conforme a política de privacidade.</label>
-          <button class="btn" type="submit">Continuar no WhatsApp <span class="btn__arrow">→</span></button>
-        </form>
-      </div>
-    </div>`);
+`);
 }
 
 /* ==========================================================================
@@ -687,6 +670,11 @@ function initScrollScenes() {
       if (r.bottom < 0 || r.top > vh) return;
       const p = reduced ? .3 : clamp(-r.top / (sc.offsetHeight - vh));
       sc.style.setProperty('--sp', p.toFixed(4));
+      // túnel de fotos: item que passou da câmera some de vez (nada fica preso na tela com o texto)
+      if (sc.classList.contains('depth')) {
+        const its = sc._depth || (sc._depth = $$('.depth__item', sc).map((el) => ({ el, z: parseFloat(el.style.getPropertyValue('--z')) || 0 })));
+        its.forEach(({ el, z }) => { el.style.visibility = z + p * 5600 > 460 ? 'hidden' : ''; });
+      }
       if (!sc.hasAttribute('data-deck')) return;
       // baralho: o card da frente sai e o seguinte assume; um respiro no fim antes de soltar a cena
       const cards = sc._cards || (sc._cards = $$('.deck__card', sc));
@@ -698,6 +686,10 @@ function initScrollScenes() {
         sc._active = active;
         items.forEach((it, i) => it.classList.toggle('is-active', i === active));
         $('.deck__count', sc).textContent = String(active + 1).padStart(2, '0');
+        const end = active === items.length - 1;
+        sc.classList.toggle('is-end', end);
+        const cta = $('.deck__cta .btn', sc);
+        if (cta) cta.tabIndex = end ? 0 : -1;
       }
     });
 
@@ -749,6 +741,45 @@ function initSlides() {
       if (e.isIntersecting) { imgs.forEach((im) => { im.loading = 'eager'; }); start(); } else stop();
     }, { threshold: .15 }).observe(box.closest('section') || box);
   });
+}
+
+/* Clubes VIP: vídeo da faixa. Tenta tocar com som; se o navegador bloquear, começa mudo e liga o som no primeiro toque/clique */
+function initVipVideo() {
+  const v = $('.vip-video video');
+  const btn = $('[data-vip-sound]');
+  if (!v) return;
+  const section = v.closest('section');
+  const label = (on) => {
+    if (!btn) return;
+    btn.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', on);
+    $('.sound-btn__txt', btn).textContent = on ? 'Som ligado' : 'Ativar som';
+  };
+  const unlock = () => {
+    ['pointerdown', 'keydown', 'touchstart'].forEach((t) => removeEventListener(t, unlock));
+    if (v.dataset.userMuted) return;
+    v.muted = false; label(true);
+    if (v.paused && visible) v.play().catch(() => {});
+  };
+  let visible = false;
+  const play = () => {
+    v.muted = false; label(true);
+    v.play().catch(() => {
+      v.muted = true; label(false);
+      v.play().catch(() => {});
+      ['pointerdown', 'keydown', 'touchstart'].forEach((t) => addEventListener(t, unlock, { once: true }));
+    });
+  };
+  btn?.addEventListener('click', () => {
+    v.muted = !v.muted;
+    v.dataset.userMuted = v.muted ? '1' : '';
+    label(!v.muted);
+    if (v.paused) v.play().catch(() => {});
+  });
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible) { if (v.preload !== 'auto') v.preload = 'auto'; play(); } else v.pause();
+  }, { threshold: .35 }).observe(section);
 }
 
 /* ==========================================================================
@@ -869,9 +900,22 @@ function initVideos() {
    Filme de abertura: cada tema troca o título e o texto do hero
    ========================================================================== */
 const THEME_SECONDS = 7.5;
+// imagem de cada tema: WebGL faz a transição; sem WebGL, a foto troca com fade
+function swapHeroImage(src) {
+  if (!src) return;
+  if (heroGL && $('.hero').classList.contains('is-gl')) { heroGL.setImage(src); return; }
+  const img = $('.hero__photo img');
+  if (!img || img.getAttribute('src') === src) return;
+  img.style.transition = 'opacity .6s ease';
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = src;
+    img.onload = () => { img.style.opacity = '1'; };
+  }, 600);
+}
 function initFilm() {
   const film = $('.film');
-  if (!film) return;
+  if (!film) { setTimeout(() => $('.hero__slide')?.classList.add('is-in'), 0); return; }
   const chapters = $$('.film__ch', film);
   const slides = $$('.hero__slide');
   const caption = $('.film__caption');
@@ -895,6 +939,7 @@ function initFilm() {
     next.inert = false;
     // espera as letras do tema anterior saírem antes de entrar o novo
     setTimeout(() => next.classList.add('is-in'), prev ? 650 : 0);
+    if (prev) swapHeroImage(next.dataset.img);
     idx = i;
   };
   const set = (i) => {
@@ -1172,46 +1217,24 @@ function initBreath() {
 }
 
 /* ==========================================================================
-   Agendamento (modal → WhatsApp com origem)
+   Agendamento: os botões abrem o WhatsApp da recepção com a especialidade e a origem
    ========================================================================== */
 function initBooking() {
-  const modal = $('.modal');
-  const form = $('form', modal);
-  let lastFocus = null;
-  const open = (esp) => {
-    lastFocus = document.activeElement;
-    closeMenu();
-    if (esp) { const r = $(`input[value="${esp}"]`, form); if (r) r.checked = true; }
-    modal.classList.add('is-open');
-    document.body.classList.add('is-locked');
-    setTimeout(() => $('#f-nome').focus(), 300);
-  };
-  const close = () => {
-    modal.classList.remove('is-open');
-    document.body.classList.remove('is-locked');
-    lastFocus?.focus();
-  };
+  $$('[data-agendar]').forEach((el) => {
+    el.classList.add('btn--wa');
+    if (!el.querySelector('.btn__wa')) el.insertAdjacentHTML('afterbegin', `<span class="btn__wa" aria-hidden="true">${waIcon}</span>`);
+    if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', `${el.textContent.trim()} pelo WhatsApp`);
+  });
   document.addEventListener('click', (e) => {
     const t = e.target.closest('[data-agendar]');
-    if (t) { e.preventDefault(); open(t.dataset.agendar); }
-    if (e.target.closest('[data-close]')) close();
-  });
-  addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (modal.classList.contains('is-open')) close();
-    else closeMenu();
-  });
-  form.addEventListener('submit', (e) => {
+    if (!t) return;
     e.preventDefault();
-    const nome = form.nome.value.trim();
-    if (!nome) { form.nome.focus(); form.nome.style.borderColor = '#c0392b'; return; }
-    if (!form.lgpd.checked) { form.lgpd.focus(); return; }
-    const esp = form.esp.value;
-    const extra = form.msg.value.trim();
-    const msg = `Olá! Sou ${nome} e gostaria de agendar uma avaliação de ${esp}.\n(Origem: site, página ${pageName})${extra ? `\n\n${extra}` : ''}`;
+    closeMenu();
+    const esp = t.dataset.agendar;
+    const msg = `Olá! Gostaria de agendar uma avaliação${esp ? ` de ${esp}` : ''}.\n(Origem: site, página ${pageName})`;
     window.open(waLink(msg), '_blank', 'noopener');
-    close();
   });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 }
 
 /* Links de WhatsApp com mensagem de origem específica */
@@ -1270,6 +1293,7 @@ initVideos();
 initScrollScenes();
 initCarousel();
 initSlides();
+initVipVideo();
 initVisitSlides();
 initBeforeAfter();
 initTreatmentList();
@@ -1288,6 +1312,7 @@ const heroGL = initHeroGL();
 const start = () => {
   document.body.classList.add('is-loaded');
   heroGL?.start();
+  heroGL?.preload($$('.hero__slide[data-img]').map((s) => s.dataset.img));
   initReveals();
   initScramble();
   initFilm();

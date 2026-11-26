@@ -192,8 +192,9 @@
      ------------------------------------------------------------------------ */
   const HERO_FS = `
     precision highp float;
-    uniform sampler2D uTex;
-    uniform vec2 uRes, uImg, uMouse;
+    uniform sampler2D uTex, uTexB;
+    uniform vec2 uRes, uImg, uImgB, uMouse;
+    uniform float uMix;
     uniform vec4 uRect;
     uniform float uVel, uTime, uScroll, uReveal, uHasTex, uFadeL, uDim;
     ${NOISE}
@@ -207,17 +208,27 @@
       float streak = 0.5 + 0.5 * sin((p.x * 2.0 + q.y * 3.0 + n * 4.0) * 6.0 + uTime * 0.3);
       return col + GOLD * pow(streak, 14.0) * 0.1 * smoothstep(0.4, 0.9, n);
     }
-    vec3 photo(vec2 frag, vec3 col){
-      if (uHasTex < 0.5) return col;
-      vec2 local = (frag - uRect.xy) / uRect.zw;
-      float rA = uRect.z / uRect.w, iA = uImg.x / uImg.y;
+    // enquadra a foto no retângulo da área da foto (cobre, ancorada no topo, onde ficam os rostos)
+    vec2 coverUV(vec2 local, vec2 size, float zoom){
+      float rA = uRect.z / uRect.w, iA = size.x / size.y;
       vec2 uv = local;
       if (rA > iA) { float fr = iA / rA; uv.y = local.y * fr; }
       else { float fr = rA / iA; uv.x = local.x * fr + (1.0 - fr) * 0.5; }
-      uv = (uv - vec2(0.5, 0.0)) * (1.0 - uScroll * 0.1) + vec2(0.5, 0.0);
-      vec3 img = texture2D(uTex, clamp(uv, 0.0, 1.0)).rgb;
+      return clamp((uv - vec2(0.5, 0.0)) * zoom + vec2(0.5, 0.0), 0.0, 1.0);
+    }
+    vec3 photo(vec2 frag, vec3 col){
+      if (uHasTex < 0.5) return col;
+      vec2 local = (frag - uRect.xy) / uRect.zw;
+      float z = 1.0 - uScroll * 0.1;
+      vec3 img = texture2D(uTex, coverUV(local, uImg, z)).rgb;
+      if (uMix > 0.0) {
+        // a próxima foto entra com uma frente suave de baixo para cima, com leve zoom
+        vec3 nb = texture2D(uTexB, coverUV(local, uImgB, z * (1.0 - (1.0 - uMix) * 0.06))).rgb;
+        float front = smoothstep(uMix * 1.4 - 0.4, uMix * 1.4, 1.0 - local.y + fbm(local * 3.0) * 0.25);
+        img = mix(img, nb, uMix >= 1.0 ? 1.0 : 1.0 - front);
+      }
       float inside = step(0.0, local.x) * step(local.x, 1.0) * step(0.0, local.y) * step(local.y, 1.0);
-      float mask = inside * smoothstep(0.0, max(uFadeL, 0.001), local.x) * smoothstep(1.0, 0.62, local.y);
+      float mask = inside * smoothstep(0.0, max(uFadeL, 0.001), local.x) * smoothstep(1.0, 0.88, local.y) * smoothstep(0.0, 0.1, local.y);
       return mix(col, img, mask * uDim);
     }
     void main(){
@@ -271,14 +282,36 @@
     if (!gl) return null;
     const p = program(gl, QUAD_VS, HERO_FS);
     fullQuad(gl, p);
-    const u = uniforms(gl, p, ['uTex', 'uRes', 'uImg', 'uMouse', 'uRect', 'uVel', 'uTime', 'uScroll', 'uReveal', 'uHasTex', 'uFadeL', 'uDim']);
+    const u = uniforms(gl, p, ['uTex', 'uTexB', 'uRes', 'uImg', 'uImgB', 'uMix', 'uMouse', 'uRect', 'uVel', 'uTime', 'uScroll', 'uReveal', 'uHasTex', 'uFadeL', 'uDim']);
     let hasTex = 0;
-    let imgSize = [1, 1];
-    loadTexture(gl, src, (size) => {
-      imgSize = size;
-      hasTex = 1;
-      onTexture?.();
-    });
+    // cache de texturas por endereço; A = foto atual, B = foto que está entrando
+    const cache = new Map();
+    const getTex = (url, done) => {
+      const hit = cache.get(url);
+      if (hit && hit.tex) { done(hit); return; }
+      if (hit) { hit.wait.push(done); return; }
+      const entry = { tex: null, size: [1, 1], wait: [done] };
+      cache.set(url, entry);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const t = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, t);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+          entry.tex = t;
+          entry.size = [img.naturalWidth, img.naturalHeight];
+          entry.wait.forEach((f) => f(entry));
+          entry.wait = [];
+        } catch { cache.delete(url); /* file:// bloqueia texturas */ }
+      };
+      img.src = url;
+    };
+    const cur = { a: null, b: null, mixStart: 0 };
+    getTex(src, (e) => { cur.a = e; hasTex = 1; onTexture?.(); });
 
     const mouse = { x: -9999, y: -9999, px: -9999, py: -9999, vel: 0 };
     addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
@@ -300,18 +333,45 @@
       const rev = state.revealStart === null ? 0 : Math.min(1, (now - state.revealStart) / 2200);
       gl.uniform2f(u.uRes, canvas.width, canvas.height);
       gl.uniform4f(u.uRect, (pr.left - cr.left) * dpr, (pr.top - cr.top) * dpr, pr.width * dpr, pr.height * dpr);
-      gl.uniform2f(u.uImg, imgSize[0], imgSize[1]);
+      let mix = 0;
+      if (cur.b) {
+        mix = Math.min(1, (now - cur.mixStart) / 1500);
+        mix = mix < 0.5 ? 4 * mix * mix * mix : 1 - Math.pow(-2 * mix + 2, 3) / 2;
+        if (now - cur.mixStart >= 1500) { cur.a = cur.b; cur.b = null; mix = 0; }
+      }
+      if (cur.a) {
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, cur.a.tex); gl.uniform1i(u.uTex, 0);
+        gl.uniform2f(u.uImg, cur.a.size[0], cur.a.size[1]);
+      }
+      if (cur.b) {
+        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, cur.b.tex); gl.uniform1i(u.uTexB, 1);
+        gl.uniform2f(u.uImgB, cur.b.size[0], cur.b.size[1]);
+      }
+      gl.uniform1f(u.uMix, mix);
       gl.uniform2f(u.uMouse, (sm.x - cr.left) * dpr, (sm.y - cr.top) * dpr);
       gl.uniform1f(u.uVel, mouse.vel);
       gl.uniform1f(u.uTime, (now - t0) / 1000);
       gl.uniform1f(u.uScroll, Math.min(1, Math.max(0, -cr.top / cr.height)));
       gl.uniform1f(u.uReveal, 1 - Math.pow(1 - rev, 3));
       gl.uniform1f(u.uHasTex, hasTex);
-      gl.uniform1f(u.uFadeL, isMobile() ? 0 : 0.55);
+      gl.uniform1f(u.uFadeL, isMobile() ? 0 : 0.16);
       gl.uniform1f(u.uDim, isMobile() ? 0.5 : 1);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     });
-    return { start() { state.revealStart = performance.now(); } };
+    return {
+      start() { state.revealStart = performance.now(); },
+      // pré-carrega as fotos dos temas para a troca não esperar a rede
+      preload(urls) { urls.forEach((url) => getTex(url, () => {})); },
+      // troca a foto com transição; se a textura ainda não carregou, entra assim que carregar
+      setImage(url) {
+        getTex(url, (e) => {
+          if (cur.a === e && !cur.b) return;
+          if (cur.b) cur.a = cur.b;
+          cur.b = e;
+          cur.mixStart = performance.now();
+        });
+      },
+    };
   }
 
   /* ------------------------------------------------------------------------
