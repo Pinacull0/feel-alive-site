@@ -120,6 +120,9 @@ input, select, textarea { font: inherit; color: inherit; }
 .btn--ghost { --bg: transparent; --fg: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
 .btn--ghost:hover { box-shadow: inset 0 0 0 1px var(--gold); }
 .btn--sm { padding: 13px 22px; font-size: 11px; }
+.btn__wa { display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; flex-shrink: 0; }
+.btn__wa svg { width: 100%; height: 100%; }
+.link-line .btn__wa { vertical-align: -0.25em; margin-right: 0.5em; }
 .link-line { position: relative; font-size: 12px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; padding-bottom: 6px; }
 .link-line::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: currentColor; transform-origin: right; transition: transform .6s var(--ease); }
 .link-line:hover::after { transform: scaleX(0); transform-origin: right; animation: line-back .6s .3s var(--ease) forwards; }
@@ -272,9 +275,18 @@ input, select, textarea { font: inherit; color: inherit; }
 .hero { position: relative; min-height: 100svh; background: var(--black); color: var(--white); overflow: hidden; display: grid; align-items: end; padding: calc(var(--header-h) + 40px) 0 clamp(28px, 5vw, 56px); }
 .hero__media { position: absolute; inset: 0; z-index: 0; }
 .hero__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
-.hero__photo { position: absolute; right: 0; top: 0; bottom: 0; width: min(62vw, 980px); overflow: hidden; }
+.hero__photo { position: absolute; right: 0; top: 0; bottom: 0; width: var(--photo-w); overflow: hidden; }
+/* o texto nunca invade a foto: largura livre = da margem do container até onde a foto começa, com respiro */
+:root { --photo-w: min(56vw, 900px); --free-w: calc(100vw - var(--photo-w) - (100vw - min(100vw, var(--max))) / 2 - var(--gutter) - 40px); }
 .hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform-origin: 50% 0; animation: kenburns 18s var(--ease) infinite alternate; }
 .hero__photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--black) 0%, rgba(10, 10, 10, .55) 34%, rgba(10, 10, 10, 0) 70%), linear-gradient(0deg, var(--black) 0%, rgba(10, 10, 10, 0) 40%); }
+/* Home: foto do casal inteira, num quadro na proporção da imagem (vale só para a home) */
+@media (min-width: 901px) {
+  .hero { --photo-w: min(58vw, 960px); --photo-h: calc(var(--photo-w) / 1.62); --free-w: calc(100vw - var(--photo-w) - (100vw - min(100vw, var(--max))) / 2 - var(--gutter) - 40px); }
+  .hero .hero__photo { top: max(var(--header-h), calc(50% - var(--photo-h) / 2 - 30px)); bottom: auto; height: var(--photo-h); }
+  .hero .hero__photo img { object-position: 50% 50%; animation: none; }
+  .hero .hero__photo::after { background: linear-gradient(90deg, var(--black) 0%, rgba(10, 10, 10, .4) 10%, rgba(10, 10, 10, 0) 24%), linear-gradient(180deg, var(--black) 0%, rgba(10, 10, 10, 0) 10%), linear-gradient(0deg, var(--black) 0%, rgba(10, 10, 10, 0) 14%); }
+}
 .hero__glow { position: absolute; width: 60vmax; height: 60vmax; left: -20vmax; top: -10vmax; border-radius: 50%; background: radial-gradient(circle, rgba(228, 181, 49, .16), transparent 60%); filter: blur(10px); animation: drift 14s ease-in-out infinite alternate; }
 .hero__grain { position: absolute; inset: -50%; opacity: .07; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation: grain 1s steps(6) infinite; }
 @keyframes kenburns { from { transform: scale(1.02); } to { transform: scale(1.08) translate(-1%, 0); } }
@@ -284,6 +296,12 @@ input, select, textarea { font: inherit; color: inherit; }
 .hero__eyebrow { color: var(--gold); margin-bottom: -8px; opacity: 0; transform: translateY(20px); transition: 1.4s var(--ease) .9s; }
 .is-loaded .hero__eyebrow { opacity: 1; transform: none; }
 .hero .h1 { max-width: 15ch; }
+@media (min-width: 901px) {
+  .hero .h1, .hero__sub { max-width: var(--free-w); }
+  .hero .h1 { font-size: clamp(2.4rem, 4vw, 4.8rem); }
+  .page-hero:has(.hero__photo) .container > * { max-width: var(--free-w); }
+  .page-hero:has(.hero__photo) .h1 { font-size: clamp(2.4rem, 4vw, 4.8rem); }
+}
 .hero__slides { display: grid; }
 .hero__slide { grid-area: 1 / 1; display: grid; gap: 28px; align-content: end; visibility: hidden; }
 .hero__slide.is-active, .hero__slide.is-out { visibility: visible; }
@@ -628,6 +646,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .tlist__head:hover { padding-left: 16px; }
 .tlist__idx { font-size: 12px; color: var(--gold-deep); letter-spacing: .14em; font-weight: 600; }
 .tlist__title { font-family: var(--f-display); font-size: clamp(1.7rem, 3.4vw, 3rem); font-weight: 400; line-height: 1.05; }
+.tlist__sub { display: block; margin-top: 6px; font-family: var(--f-display); font-style: italic; font-weight: 400; font-size: clamp(1rem, 1.3vw, 1.25rem); line-height: 1.3; color: var(--gold); }
 .tlist__plus { position: relative; width: 44px; height: 44px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line); transition: background .4s, transform .6s var(--ease); }
 .tlist__plus::before, .tlist__plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 1.5px; margin: -.75px 0 0 -7px; background: currentColor; transition: transform .6s var(--ease); }
 .tlist__plus::after { transform: rotate(90deg); }
@@ -830,7 +849,7 @@ canvas[data-silk] { position: absolute; inset: 0; width: 100%; height: 100%; bac
 .depth { position: relative; height: 420vh; background: var(--black); color: var(--white); }
 .depth__sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 .depth__stage { position: absolute; inset: 0; z-index: 1; perspective: 900px; perspective-origin: 50% 50%; }
-.depth__item { z-index: 1; --zpos: calc(var(--z) + var(--sp, 0) * 4800); position: absolute; left: 50%; top: 50%; width: clamp(150px, 19vw, 300px); aspect-ratio: 3 / 4; margin: 0; border-radius: 16px; overflow: hidden; background: var(--ink); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8); transform: translate(-50%, -50%) translate3d(var(--x), var(--y), calc(var(--zpos) * 1px)); opacity: min(clamp(0, calc((var(--zpos) + 3600) / 1300), 1), clamp(0, calc((780 - var(--zpos)) / 380), 1)); will-change: transform; }
+.depth__item { z-index: 1; --zpos: calc(var(--z) + var(--sp, 0) * 5600); position: absolute; left: 50%; top: 50%; width: clamp(150px, 19vw, 300px); aspect-ratio: 3 / 4; margin: 0; border-radius: 16px; overflow: hidden; background: var(--ink); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .8); transform: translate(-50%, -50%) translate3d(var(--x), var(--y), calc(var(--zpos) * 1px)); opacity: min(clamp(0, calc((var(--zpos) + 3600) / 1300), 1), clamp(0, calc((520 - var(--zpos)) / 380), 1)); will-change: transform; }
 .depth__item img, .depth__item video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; border-radius: 16px; }
 .depth__item { clip-path: inset(0 round 16px); }
 .depth__caption { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: 22px; text-align: center; padding: var(--gutter); pointer-events: none; opacity: clamp(0, calc((var(--sp, 0) - .08) * 5), 1); transform: scale(calc(.88 + var(--sp, 0) * .2)); }
@@ -856,6 +875,9 @@ canvas[data-silk] { position: absolute; inset: 0; width: 100%; height: 100%; bac
 .deck__count { color: var(--gold); }
 .deck__bar { position: relative; width: 140px; height: 1px; background: var(--line-on-dark); }
 .deck__bar i { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(var(--sp, 0)); }
+/* botão que surge quando o último card do baralho está ativo */
+.deck__cta { opacity: 0; transform: translateY(18px); pointer-events: none; transition: opacity .6s var(--ease), transform .8s var(--ease); }
+.deck.is-end .deck__cta { opacity: 1; transform: none; pointer-events: auto; }
 .deck__stack { position: relative; height: min(72vh, 620px); perspective: 1400px; }
 .deck__card { --t: clamp(0, calc(var(--k, 0) - var(--i)), 1); --d: max(0, calc(var(--i) - var(--k, 0)));
   position: absolute; inset: 0; margin: auto; width: min(100%, calc(min(72vh, 620px) * .78)); aspect-ratio: 4 / 5; height: auto; border-radius: 22px; overflow: hidden; background: var(--ink);
@@ -922,6 +944,7 @@ canvas[data-silk] { position: absolute; inset: 0; width: 100%; height: 100%; bac
 
 .vip-band__photo { position: absolute; inset: 0 0 0 auto; width: min(54vw, 820px); z-index: 0; }
 .vip-band__photo { width: min(72vw, 1100px); overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .3) 24%, #000 58%); mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, .3) 24%, #000 58%); }
+.vip-band__photo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .vip-band__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* troca suave: as fotos se sobrepõem com fade e um zoom lento */
 .vip-slides img { opacity: 0; transform: scale(1.08); transition: opacity 1.8s ease-in-out, transform 8s linear; will-change: opacity, transform; }
@@ -1023,3 +1046,29 @@ canvas[data-water] { position: absolute; inset: 0; width: 100%; height: 100%; z-
   .loader { display: none; }
   .marquee__track { animation: none; }
 }
+
+/* Clubes VIP: vídeo com som e botão para ligar/desligar */
+.vip-sound { position: absolute; right: var(--gutter); bottom: clamp(24px, 4vw, 48px); z-index: 2; cursor: pointer; background: rgba(10, 10, 10, .45); backdrop-filter: blur(8px); color: #fff; }
+.vip-sound:not(.is-on) .sound-btn__eq i { height: 30%; }
+
+/* Estética (topo): foto grande encostada à direita, mostrando os rostos e o atendimento, sem entrar no texto */
+@media (min-width: 901px) {
+  body[data-page="estetica"] .page-hero { min-height: calc(88svh + 120px); padding-bottom: calc(clamp(48px, 7vw, 100px) + 120px); }
+  body[data-page="estetica"] .page-hero .hero__photo { --foto-w: min(46vw, calc((88svh - var(--header-h)) * 1.05)); top: var(--header-h); width: var(--foto-w); -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%); mask-image: linear-gradient(90deg, transparent, #000 28%); }
+  body[data-page="estetica"] .page-hero .hero__photo img { object-fit: cover; object-position: 50% max(100%, calc(min(46vw, (88svh - var(--header-h)) * 1.05) * -.336)); animation: none; }
+  body[data-page="estetica"] .page-hero .hero__photo::after { background: linear-gradient(180deg, var(--black) 0%, rgba(10, 10, 10, 0) 10%), linear-gradient(0deg, var(--black) 0%, rgba(10, 10, 10, 0) 14%); }
+}
+
+/* Estética (baralho): cada card assume a proporção da própria foto, que aparece inteira */
+body[data-page="estetica"] .deck__card { width: auto; height: 100%; max-width: 100%; aspect-ratio: var(--ar); }
+body[data-page="estetica"] .deck__card img { object-fit: contain; scale: 1; }
+
+/* Antes e depois com a foto única (antes à esquerda, depois à direita): cada metade vira um lado do comparador */
+.ba--split { aspect-ratio: 360 / 638; }
+.ba--split .ba__img { overflow: hidden; }
+.ba--split .ba__img img { position: absolute; top: 0; left: 0; width: 200%; max-width: none; height: 100%; object-fit: cover; }
+.ba--split .ba__after img { left: -100%; }
+
+/* Clubes VIP (topo): vídeo no lugar da foto */
+.page-hero__photo video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 35%; }
+.page-hero:has(.vip-video) .vip-band__ring { display: none; }
